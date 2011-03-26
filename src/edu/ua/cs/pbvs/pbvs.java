@@ -24,6 +24,8 @@ import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
+import android.widget.Toast;
+
 public class pbvs extends BaseGameActivity {
 	// ===========================================================
 	// Constants
@@ -38,20 +40,19 @@ public class pbvs extends BaseGameActivity {
 
 	private Camera mCamera;
 
-	private Texture mTexture;
-	private TiledTextureRegion mPlayerTextureRegion;
-	private TiledTextureRegion mPlayerTextureRegion_back;
+	private Texture mTexture;  //I think this is like a texture container.  or something.
+	private TiledTextureRegion mPlayerTextureRegion; // player texture
 	private TiledTextureRegion mEnemyTextureRegion;
 
 	private Texture mAutoParallaxBackgroundTexture;
 
-	private TextureRegion mParallaxLayerBack;
+	private TextureRegion mParallaxLayerBack;  //parallax textures
 	private TextureRegion mParallaxLayerMid;
 	private TextureRegion mParallaxLayerFront;
 	
-	private Texture nTexture;
+	private Texture nTexture; //other container.
 	
-	private Texture mOnScreenControlTexture;
+	private Texture mOnScreenControlTexture;  //button thing
 	private TextureRegion mOnScreenControlBaseTextureRegion;
 	private TextureRegion mOnScreenControlKnobTextureRegion;
 
@@ -68,17 +69,21 @@ public class pbvs extends BaseGameActivity {
 	// ===========================================================
 
 	public Engine onLoadEngine() {
-			this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+			this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT); 
 			return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), this.mCamera));
+			//I dont really know what can be done to these.
+			//check the Tiled map thingy
 	}
 
 	public void onLoadResources() {
-			this.mTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+			this.mTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 			this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.mTexture, this, "gfx/player.png", 0, 0, 3, 4);
-			this.mPlayerTextureRegion_back = TextureRegionFactory.createTiledFromAsset(this.mTexture, this, "gfx/player.png", 0, 0, 9, 10);
 			this.mEnemyTextureRegion = TextureRegionFactory.createTiledFromAsset(this.mTexture, this, "gfx/enemy.png", 73, 0, 3, 4);
+			/*
+			 * createTiledFromAsset gets a asset, and cuts it into rows and columns.  in this case, 3 is the rows, 4 is the columns
+			 */
 
-			this.mAutoParallaxBackgroundTexture = new Texture(1024, 1024, TextureOptions.DEFAULT);
+			this.mAutoParallaxBackgroundTexture = new Texture(1024, 1024, TextureOptions.DEFAULT);  
 			this.mParallaxLayerFront = TextureRegionFactory.createFromAsset(this.mAutoParallaxBackgroundTexture, this, "gfx/parallax_background_layer_front.png", 0, 0);
 			this.mParallaxLayerBack = TextureRegionFactory.createFromAsset(this.mAutoParallaxBackgroundTexture, this, "gfx/parallax_background_layer_back.png", 0, 188);
 			this.mParallaxLayerMid = TextureRegionFactory.createFromAsset(this.mAutoParallaxBackgroundTexture, this, "gfx/parallax_background_layer_mid.png", 0, 669);
@@ -102,23 +107,25 @@ public class pbvs extends BaseGameActivity {
 			/* Calculate the coordinates for the face, so its centered on the camera. */
 			final int playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
 			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
+			
 			final AnimatedSprite player = this.makeSprite(playerX, playerY, this.mPlayerTextureRegion);
 			final AnimatedSprite enemy = this.makeSprite(playerX - 80, playerY, this.mEnemyTextureRegion);
+			//I made a makeSprite wrapper cause I thought it made sense.
 			
-			scene.getLastChild().attachChild(player);
-			scene.getLastChild().attachChild(enemy);
+			scene.getLastChild().attachChild(player);  // I haven't a clue what this is about,
+			scene.getLastChild().attachChild(enemy);   // but it appears to add things to the screen.
 			
 			final PhysicsHandler controlHandler = new PhysicsHandler(player);
-			player.registerUpdateHandler(controlHandler);
+			player.registerUpdateHandler(controlHandler);  //this is the thing that the controls control.
 			
 			final ParallaxBackground paraBack = this.loadmanualParallax();
-			scene.setBackground( paraBack );
+			scene.setBackground( paraBack );  
 			
-			final DigitalOnScreenControl digitalOnScreenControl = this.loadControl(controlHandler, paraBack, player);
+			final DigitalOnScreenControl digitalOnScreenControl = this.loadControl(controlHandler, paraBack, player, enemy);
+			//makes and configures the onscreen controls.
 
 			scene.setChildScene(digitalOnScreenControl);
-
-			/* Create two sprits and add it to the scene. */
+			//adds them to the scene
 
 			return scene;
 	}
@@ -145,10 +152,11 @@ public class pbvs extends BaseGameActivity {
 		ParallaxBackground.attachParallaxEntity(new ParallaxEntity(0.0f, new Sprite(0, CAMERA_HEIGHT - this.mParallaxLayerBack.getHeight(), this.mParallaxLayerBack)));
 		ParallaxBackground.attachParallaxEntity(new ParallaxEntity(-5.0f, new Sprite(0, 80, this.mParallaxLayerMid)));
 		ParallaxBackground.attachParallaxEntity(new ParallaxEntity(-10.0f, new Sprite(0, CAMERA_HEIGHT - this.mParallaxLayerFront.getHeight(), this.mParallaxLayerFront)));
+		//I dont know the specifics here.
 		return ParallaxBackground;
 	}
 	
-	private DigitalOnScreenControl loadControl( final PhysicsHandler physicsHandler, final ParallaxBackground paraBack, final AnimatedSprite player)
+	private DigitalOnScreenControl loadControl( final PhysicsHandler physicsHandler, final ParallaxBackground paraBack, final AnimatedSprite player, final AnimatedSprite enemy)
 	{
 
 		final DigitalOnScreenControl digitalOnScreenControl = new DigitalOnScreenControl(0, CAMERA_HEIGHT - this.mOnScreenControlBaseTextureRegion.getHeight(), this.mCamera, this.mOnScreenControlBaseTextureRegion, this.mOnScreenControlKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
@@ -157,16 +165,19 @@ public class pbvs extends BaseGameActivity {
 			int dir = 0;
 			boolean run = true;
 			
-			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float pValueX, final float pValueY) {
-				if (pValueY < 0)
+			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXval, final float controlYVal ) {
+				physicsHandler.setVelocity(controlXval * 0, controlYVal * 100); //when controls are idle the values = 0
+				
+				if (player.collidesWith(enemy))
 				{
-					physicsHandler.setVelocity(pValueX * 0, pValueY * 100);
+					enemy.setAlpha(-1f);
 				}
 				else
 				{
-					physicsHandler.setVelocity(pValueX * 0, pValueY * 0);
+					enemy.setAlpha(1f);
 				}
-				if(pValueX > 0)
+				
+				if(controlXval > 0)
 				{
 					if (!(dir > 0))
 					{
@@ -189,7 +200,7 @@ public class pbvs extends BaseGameActivity {
 					}
 					this.count+=1.50f;
 				}
-				else if (pValueX < 0)
+				else if (controlXval < 0)
 				{
 					if (!(dir < 0))
 					{
@@ -216,7 +227,6 @@ public class pbvs extends BaseGameActivity {
 				else
 				{
 					player.stopAnimation();
-					//player.reset();
 				}
 				paraBack.setParallaxValue((float)this.count);
 			}
