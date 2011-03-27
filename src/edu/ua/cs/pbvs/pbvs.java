@@ -4,7 +4,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.BoundCamera;
-import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.camera.hud.controls.BaseOnScreenControl;
 import org.anddev.andengine.engine.camera.hud.controls.BaseOnScreenControl.IOnScreenControlListener;
 import org.anddev.andengine.engine.camera.hud.controls.DigitalOnScreenControl;
@@ -18,6 +17,7 @@ import org.anddev.andengine.entity.scene.background.ParallaxBackground.ParallaxE
 import org.anddev.andengine.entity.sprite.AnimatedSprite;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.util.FPSLogger;
+import org.anddev.andengine.level.LevelLoader;
 import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
@@ -41,8 +41,9 @@ public class pbvs extends BaseGameActivity {
 	private BoundCamera mCamera;
 
 	private Texture spriteTexture;  //I think this is like a texture container.  or something.
+	private Texture playerTexture;  //I think this is like a texture container.  or something.
+	private TextureRegion facebox; // player texture
 	private TiledTextureRegion mPlayerTextureRegion; // player texture
-	private TiledTextureRegion facebox; // player texture
 
 	private Texture mAutoParallaxBackgroundTexture;
 
@@ -53,6 +54,29 @@ public class pbvs extends BaseGameActivity {
 	private Texture mOnScreenControlTexture;  //button thing
 	private TextureRegion mOnScreenControlBaseTextureRegion;
 	private TextureRegion mOnScreenControlKnobTextureRegion;
+	
+	private Texture mOnScreenButtonTexture;  //button thing
+	private TextureRegion mOnScreenButtonBaseTextureRegion;
+	private TextureRegion mOnScreenButtonKnobTextureRegion;
+	
+	
+	/*
+	 * Here are the xml attributes.
+	 */
+	private static final String TAG_ENTITY = "entity";
+	private static final String TAG_ENTITY_ATTRIBUTE_X = "x";
+	private static final String TAG_ENTITY_ATTRIBUTE_Y = "y";
+	private static final String TAG_ENTITY_ATTRIBUTE_WIDTH = "width";
+	private static final String TAG_ENTITY_ATTRIBUTE_HEIGHT = "height";
+	private static final String TAG_ENTITY_ATTRIBUTE_TYPE = "type";
+	
+	/*
+	 * Here are the XML object types
+	 */
+	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_METALBOX = "metalbox";
+	//private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_CIRCLE = "circle";
+	//private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_TRIANGLE = "triangle";
+	//private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HEXAGON = "hexagon";
 
 	// ===========================================================
 	// Constructors
@@ -81,15 +105,22 @@ public class pbvs extends BaseGameActivity {
 			 * 
 			 * WE SO EXCITED!
 			 */
+			
+			
 			return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), this.mCamera));
 			//I dont really know what can be done to these.
 			//check the Tiled map thingy
 	}
 
 	public void onLoadResources() {
-			this.spriteTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
-			this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.spriteTexture, this, "gfx/player_possible.png", 0, 0, 3, 4);
-			this.facebox = TextureRegionFactory.createTiledFromAsset(this.spriteTexture, this, "gfx/face_box_tiled.png", 0, 0, 2, 1);
+			final LevelLoader levelLoaderObj = new LevelLoader() ;
+			levelLoaderObj.setAssetBasePath("level");
+		
+			this.playerTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+			this.spriteTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+			this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "gfx/player_possible.png", 0, 0, 3, 4);
+			//this.facebox = TextureRegionFactory.createFromAsset(this.spriteTexture, this, "gfx/face_box.png", 0, 0);
+			this.facebox = TextureRegionFactory.createFromAsset(this.spriteTexture, this, "gfx/metal_block.png", 0, 0);
 			
 			/*
 			 * createTiledFromAsset gets a asset, and cuts it into rows and columns.  in this case, 3 is the rows, 4 is the columns
@@ -107,9 +138,12 @@ public class pbvs extends BaseGameActivity {
 			this.mOnScreenControlBaseTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "digital_control_base.png", 0, 0);
 			this.mOnScreenControlKnobTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "onscreen_control_knob.png", 128, 0);
 			
+			this.mOnScreenButtonTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+			this.mOnScreenButtonBaseTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenButtonTexture, this, "control_button.png", 0, 0);
+			this.mOnScreenButtonKnobTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenButtonTexture, this, "onscreen_control_knob.png", 128, 0);
 
-			this.mEngine.getTextureManager().loadTextures(this.spriteTexture, 
-					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture );
+			this.mEngine.getTextureManager().loadTextures(this.spriteTexture, this.playerTexture,
+					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture );
 	}
 
 	public Scene onLoadScene() {
@@ -121,11 +155,11 @@ public class pbvs extends BaseGameActivity {
 			final int playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
 			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
 			
-			final AnimatedSprite player = this.makeSprite(playerX, playerY, this.mPlayerTextureRegion);
-			final AnimatedSprite testBox1 = this.makeSprite(playerX+200, playerY+200, this.facebox);
-			final AnimatedSprite testBox2 = this.makeSprite(playerX-200, playerY+200, this.facebox);
-			final AnimatedSprite testBox3 = this.makeSprite(playerX+200, playerY-200, this.facebox);
-			final AnimatedSprite testBox4 = this.makeSprite(playerX-200, playerY-200, this.facebox);
+			final AnimatedSprite player = this.makeAnimatedSprite(playerX, playerY, this.mPlayerTextureRegion);
+			final Sprite testBox1 = this.makeSprite(playerX+200, playerY+200, this.facebox);
+			final Sprite testBox2 = this.makeSprite(playerX-200, playerY+200, this.facebox);
+			final Sprite testBox3 = this.makeSprite(playerX+200, playerY-200, this.facebox);
+			final Sprite testBox4 = this.makeSprite(playerX-200, playerY-200, this.facebox);
 			this.mCamera.setChaseEntity(player);
 			//I made a makeSprite wrapper cause I thought it made sense.
 			
@@ -159,12 +193,18 @@ public class pbvs extends BaseGameActivity {
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	private AnimatedSprite makeSprite(int x, int y, TiledTextureRegion texture )
+	private AnimatedSprite makeAnimatedSprite(int x, int y, TiledTextureRegion texture )
 	{
 			final AnimatedSprite nSprite = new AnimatedSprite(x, y, texture);
 			nSprite.setScaleCenterY(texture.getTileHeight());
 			nSprite.setScale(2);
-			//nSprite.animate(100);
+			return nSprite;
+	}
+	private Sprite makeSprite(int x, int y, TextureRegion texture )
+	{
+			final Sprite nSprite = new Sprite(x, y, texture);
+			nSprite.setScaleCenterY(texture.getHeight());
+			nSprite.setScale(2);
 			return nSprite;
 	}
 	
@@ -187,10 +227,10 @@ public class pbvs extends BaseGameActivity {
 			int dir = 0;
 			boolean run = true;
 			
-			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXval, final float controlYVal ) {
-				physicsHandler.setVelocity(controlXval * 100, controlYVal * 100); //when controls are idle the values = 0
+			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXVal, final float controlYVal ) {
+				physicsHandler.setVelocity(controlXVal * 100, controlYVal * 100); //when controls are idle the values = 0
 				
-				if(controlXval > 0)
+				if(controlXVal > 0)
 				{
 					if (!(dir > 0))
 					{
@@ -213,7 +253,7 @@ public class pbvs extends BaseGameActivity {
 					}
 					this.count+=1.50f;
 				}
-				else if (controlXval < 0)
+				else if (controlXVal < 0)
 				{
 					if (!(dir < 0))
 					{
@@ -241,27 +281,32 @@ public class pbvs extends BaseGameActivity {
 				{
 					player.stopAnimation();
 				}
-				paraBack.setParallaxValue((float)this.count);
+				paraBack.setParallaxValue((float)this.count/4);
 			}
 		});
-		final DigitalOnScreenControl leftControl = new DigitalOnScreenControl(CAMERA_WIDTH - (this.mOnScreenControlBaseTextureRegion.getWidth()+63), CAMERA_HEIGHT - this.mOnScreenControlBaseTextureRegion.getHeight(), this.mCamera, this.mOnScreenControlBaseTextureRegion, this.mOnScreenControlKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
-			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXval, final float controlYVal ) {
+		final DigitalOnScreenControl rightControl = new DigitalOnScreenControl(CAMERA_WIDTH - (this.mOnScreenButtonBaseTextureRegion.getWidth()+135), CAMERA_HEIGHT - this.mOnScreenButtonBaseTextureRegion.getHeight(), this.mCamera, this.mOnScreenButtonBaseTextureRegion, this.mOnScreenButtonKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
+			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXVal, final float controlYVal ) {
+				//physicsHandler.setVelocity(controlYVal * 0, controlXVal * 100); //when controls are idle the values = 0
+					if (controlXVal != 0)
+						player.animate(new long[]{1, 1, 1}, 9, 11, 1);
+				
 			}
 		});
-		leftControl.getControlBase().setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-		leftControl.getControlBase().setAlpha(0.75f);
-		leftControl.getControlBase().setScaleCenter(0, 32);
-		leftControl.getControlBase().setScale(1.50f);
-		leftControl.getControlKnob().setScale(00f);
-		leftControl.refreshControlKnobPosition();	
+		rightControl.getControlBase().setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+		rightControl.getControlBase().setAlpha(0.75f);
+		rightControl.getControlBase().setScaleCenter(0, 48);
+		rightControl.getControlBase().setScale(2.0f);
+		rightControl.getControlKnob().setScale(00f);
+		rightControl.refreshControlKnobPosition();	
+		
 		digitalOnScreenControl.getControlBase().setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		digitalOnScreenControl.getControlBase().setAlpha(0.75f);
-		digitalOnScreenControl.getControlBase().setScaleCenter(0, 32);
-		digitalOnScreenControl.getControlBase().setScale(1.50f);
+		digitalOnScreenControl.getControlBase().setScaleCenter(0, 48);
+		digitalOnScreenControl.getControlBase().setScale(2.0f);
 		digitalOnScreenControl.getControlKnob().setScale(00f);
 		digitalOnScreenControl.refreshControlKnobPosition();
 		
-		digitalOnScreenControl.setChildScene(leftControl);
+		digitalOnScreenControl.setChildScene(rightControl);
 		
 		return digitalOnScreenControl;
 			
