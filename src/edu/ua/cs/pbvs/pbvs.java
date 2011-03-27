@@ -3,6 +3,7 @@ package edu.ua.cs.pbvs;
 import javax.microedition.khronos.opengles.GL10;
 
 import org.anddev.andengine.engine.Engine;
+import org.anddev.andengine.engine.camera.BoundCamera;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.camera.hud.controls.BaseOnScreenControl;
 import org.anddev.andengine.engine.camera.hud.controls.BaseOnScreenControl.IOnScreenControlListener;
@@ -37,10 +38,11 @@ public class pbvs extends BaseGameActivity {
 	// Fields
 	// ===========================================================
 
-	private Camera mCamera;
+	private BoundCamera mCamera;
 
 	private Texture spriteTexture;  //I think this is like a texture container.  or something.
 	private TiledTextureRegion mPlayerTextureRegion; // player texture
+	private TiledTextureRegion facebox; // player texture
 
 	private Texture mAutoParallaxBackgroundTexture;
 
@@ -65,7 +67,20 @@ public class pbvs extends BaseGameActivity {
 	// ===========================================================
 
 	public Engine onLoadEngine() {
-			this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT); 
+			this.mCamera = new BoundCamera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT); 
+			/*
+			 *  Kick ass!
+			 *  
+			 * Parallax and this get along fine.  =)
+			 * 
+			 * Basically, the background follows the camera too.
+			 * 
+			 * Also, the way its set up, I think we can define object off the screen and just hit them as we hit them.  
+			 * 
+			 * I will be able to explain this much better in person.  
+			 * 
+			 * WE SO EXCITED!
+			 */
 			return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), this.mCamera));
 			//I dont really know what can be done to these.
 			//check the Tiled map thingy
@@ -73,7 +88,9 @@ public class pbvs extends BaseGameActivity {
 
 	public void onLoadResources() {
 			this.spriteTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
-			this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.spriteTexture, this, "gfx/player.png", 0, 0, 3, 4);
+			this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.spriteTexture, this, "gfx/player_possible.png", 0, 0, 3, 4);
+			this.facebox = TextureRegionFactory.createTiledFromAsset(this.spriteTexture, this, "gfx/face_box_tiled.png", 0, 0, 2, 1);
+			
 			/*
 			 * createTiledFromAsset gets a asset, and cuts it into rows and columns.  in this case, 3 is the rows, 4 is the columns
 			 */
@@ -89,6 +106,7 @@ public class pbvs extends BaseGameActivity {
 			this.mOnScreenControlTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 			this.mOnScreenControlBaseTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "digital_control_base.png", 0, 0);
 			this.mOnScreenControlKnobTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "onscreen_control_knob.png", 128, 0);
+			
 
 			this.mEngine.getTextureManager().loadTextures(this.spriteTexture, 
 					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture );
@@ -104,9 +122,18 @@ public class pbvs extends BaseGameActivity {
 			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
 			
 			final AnimatedSprite player = this.makeSprite(playerX, playerY, this.mPlayerTextureRegion);
+			final AnimatedSprite testBox1 = this.makeSprite(playerX+200, playerY+200, this.facebox);
+			final AnimatedSprite testBox2 = this.makeSprite(playerX-200, playerY+200, this.facebox);
+			final AnimatedSprite testBox3 = this.makeSprite(playerX+200, playerY-200, this.facebox);
+			final AnimatedSprite testBox4 = this.makeSprite(playerX-200, playerY-200, this.facebox);
+			this.mCamera.setChaseEntity(player);
 			//I made a makeSprite wrapper cause I thought it made sense.
 			
 			scene.getLastChild().attachChild(player);  // I haven't a clue what this is about,
+			scene.getLastChild().attachChild(testBox1);  // I haven't a clue what this is about,
+			scene.getLastChild().attachChild(testBox2);  // I haven't a clue what this is about,
+			scene.getLastChild().attachChild(testBox3);  // I haven't a clue what this is about,
+			scene.getLastChild().attachChild(testBox4);  // I haven't a clue what this is about,
 			//scene.getLastChild().attachChild(enemy);   // but it appears to add things to the screen.
 			
 			final PhysicsHandler controlHandler = new PhysicsHandler(player);
@@ -114,6 +141,7 @@ public class pbvs extends BaseGameActivity {
 			
 			final ParallaxBackground paraBack = this.loadmanualParallax();
 			scene.setBackground( paraBack );  
+			
 			
 			final DigitalOnScreenControl digitalOnScreenControl = this.loadControl(controlHandler, paraBack, player);
 			//makes and configures the onscreen controls.
@@ -160,7 +188,7 @@ public class pbvs extends BaseGameActivity {
 			boolean run = true;
 			
 			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXval, final float controlYVal ) {
-				//physicsHandler.setVelocity(controlXval * 0, controlYVal * 100); //when controls are idle the values = 0
+				physicsHandler.setVelocity(controlXval * 100, controlYVal * 100); //when controls are idle the values = 0
 				
 				if(controlXval > 0)
 				{
@@ -216,12 +244,25 @@ public class pbvs extends BaseGameActivity {
 				paraBack.setParallaxValue((float)this.count);
 			}
 		});
+		final DigitalOnScreenControl leftControl = new DigitalOnScreenControl(CAMERA_WIDTH - (this.mOnScreenControlBaseTextureRegion.getWidth()+63), CAMERA_HEIGHT - this.mOnScreenControlBaseTextureRegion.getHeight(), this.mCamera, this.mOnScreenControlBaseTextureRegion, this.mOnScreenControlKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
+			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXval, final float controlYVal ) {
+			}
+		});
+		leftControl.getControlBase().setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+		leftControl.getControlBase().setAlpha(0.75f);
+		leftControl.getControlBase().setScaleCenter(0, 32);
+		leftControl.getControlBase().setScale(1.50f);
+		leftControl.getControlKnob().setScale(00f);
+		leftControl.refreshControlKnobPosition();	
 		digitalOnScreenControl.getControlBase().setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		digitalOnScreenControl.getControlBase().setAlpha(0.75f);
 		digitalOnScreenControl.getControlBase().setScaleCenter(0, 32);
 		digitalOnScreenControl.getControlBase().setScale(1.50f);
 		digitalOnScreenControl.getControlKnob().setScale(00f);
 		digitalOnScreenControl.refreshControlKnobPosition();
+		
+		digitalOnScreenControl.setChildScene(leftControl);
+		
 		return digitalOnScreenControl;
 			
 	}
