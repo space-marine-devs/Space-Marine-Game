@@ -99,7 +99,7 @@ public class pbvs extends BaseGameActivity {
 
 			final Scene scene = new Scene(1);
 			
-			/* Calculate the coordinates for the face, so its centered on the camera. */
+			/* Calculate the coordinates for the face(do you mean player?), so its centered on the camera. */
 			final int playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
 			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
 			
