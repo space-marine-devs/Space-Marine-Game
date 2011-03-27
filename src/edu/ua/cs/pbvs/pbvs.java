@@ -93,7 +93,7 @@ public class pbvs extends BaseGameActivity {
 			this.nTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
 			this.mOnScreenControlTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-			this.mOnScreenControlBaseTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "digital_control_base.png", 0, 0);
+			this.mOnScreenControlBaseTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "digital_control_base_2.png", 0, 0);
 			this.mOnScreenControlKnobTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "onscreen_control_knob.png", 128, 0);
 
 			this.mEngine.getTextureManager().loadTextures(this.mTexture, this.mOnScreenControlTexture , this.nTexture, this.mAutoParallaxBackgroundTexture );
@@ -104,7 +104,7 @@ public class pbvs extends BaseGameActivity {
 
 			final Scene scene = new Scene(1);
 			
-			/* Calculate the coordinates for the face, so its centered on the camera. */
+			/* Calculate the coordinates for the face(do you mean player?), so its centered on the camera. */
 			final int playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
 			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
 			
