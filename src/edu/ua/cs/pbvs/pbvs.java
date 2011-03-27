@@ -1,5 +1,7 @@
 package edu.ua.cs.pbvs;
 
+import java.io.IOException;
+
 import javax.microedition.khronos.opengles.GL10;
 
 import org.anddev.andengine.engine.Engine;
@@ -18,12 +20,19 @@ import org.anddev.andengine.entity.sprite.AnimatedSprite;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.level.LevelLoader;
+import org.anddev.andengine.level.LevelLoader.IEntityLoader;
+import org.anddev.andengine.level.util.constants.LevelConstants;
 import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
+import org.anddev.andengine.util.Debug;
+import org.anddev.andengine.util.SAXUtils;
+import org.xml.sax.Attributes;
+
+import android.widget.Toast;
 
 
 public class pbvs extends BaseGameActivity {
@@ -113,8 +122,6 @@ public class pbvs extends BaseGameActivity {
 	}
 
 	public void onLoadResources() {
-			final LevelLoader levelLoaderObj = new LevelLoader() ;
-			levelLoaderObj.setAssetBasePath("level");
 		
 			this.playerTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 			this.spriteTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
@@ -147,6 +154,12 @@ public class pbvs extends BaseGameActivity {
 	}
 
 	public Scene onLoadScene() {
+			final LevelLoader levelLoaderObj = new LevelLoader() ;
+			levelLoaderObj.setAssetBasePath("level/");
+		
+
+
+			
 			this.mEngine.registerUpdateHandler(new FPSLogger());
 
 			final Scene scene = new Scene(1);
@@ -182,6 +195,46 @@ public class pbvs extends BaseGameActivity {
 
 			scene.setChildScene(digitalOnScreenControl);
 			//adds them to the scene
+			
+			levelLoaderObj.registerEntityLoader(LevelConstants.TAG_LEVEL, 
+				new IEntityLoader() {
+					@Override
+					public void onLoadEntity(final String pEntityName, final Attributes pAttributes) {
+						final int width = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_WIDTH);
+						final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_HEIGHT);
+						Toast.makeText(pbvs.this, "Loaded level with width=" + width + " and height=" + height + ".", Toast.LENGTH_LONG).show();
+					}
+				}
+			);
+
+			levelLoaderObj.registerEntityLoader(TAG_ENTITY, 
+				new IEntityLoader() {
+					@Override
+					public void onLoadEntity(final String pEntityName, final Attributes pAttributes) {
+						final int x = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_X);
+						final int y = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_Y);
+						final int width = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_WIDTH);
+						final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_HEIGHT);
+						final String type = SAXUtils.getAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_TYPE);
+		
+								
+						if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_METALBOX)) 
+						{
+							Sprite face = new Sprite(x, y, width, height, pbvs.this.facebox);
+							Toast.makeText(pbvs.this, "Thing loaded with x=" + x + " and y" + y + ".", Toast.LENGTH_LONG).show();
+							scene.getLastChild().attachChild(face);
+						}
+					}
+				}
+			);
+			
+			try {
+				levelLoaderObj.loadLevelFromAsset(this, "example2.lvl");
+			} catch (final IOException e) {
+				Debug.e(e);
+			}
+			
+			
 
 			return scene;
 	}

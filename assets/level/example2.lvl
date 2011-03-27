@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level width="800" height="480">
-	<entity x="0" y="0" width="32" height="32" type="metalbox"/>
+	<entity x="0" y="448" width="32" height="32" type="metalbox"/>
+	<entity x="32 y="448" width="32" height="32" type="metalbox"/>
 </level>
