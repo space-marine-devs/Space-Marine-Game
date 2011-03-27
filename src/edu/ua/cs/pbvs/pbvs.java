@@ -101,7 +101,7 @@ public class pbvs extends BaseGameActivity {
 			
 			/* Calculate the coordinates for the face(do you mean player?), so its centered on the camera. */
 			final int playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
-			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
+			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 10;
 			
 			final AnimatedSprite player = this.makeSprite(playerX, playerY, this.mPlayerTextureRegion);
 			//I made a makeSprite wrapper cause I thought it made sense.
@@ -160,7 +160,7 @@ public class pbvs extends BaseGameActivity {
 			boolean run = true;
 			
 			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXval, final float controlYVal ) {
-				physicsHandler.setVelocity(controlXval * 0, controlYVal * 100); //when controls are idle the values = 0
+				physicsHandler.setVelocity(controlXval * 0, controlYVal /* * 100*/); //when controls are idle the values = 0
 				
 				if(controlXval > 0)
 				{
