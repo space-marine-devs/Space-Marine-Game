@@ -73,7 +73,7 @@ public class pbvs extends BaseGameActivity {
 
 	public void onLoadResources() {
 			this.spriteTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
-			this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.spriteTexture, this, "gfx/player.png", 0, 0, 3, 4);
+			this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.spriteTexture, this, "gfx/player_possible.png", 0, 0, 3, 4);
 			/*
 			 * createTiledFromAsset gets a asset, and cuts it into rows and columns.  in this case, 3 is the rows, 4 is the columns
 			 */
@@ -87,7 +87,7 @@ public class pbvs extends BaseGameActivity {
 
 
 			this.mOnScreenControlTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-			this.mOnScreenControlBaseTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "digital_control_base_2.png", 0, 0);
+			this.mOnScreenControlBaseTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "digital_control_base.png", 0, 0);
 			this.mOnScreenControlKnobTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenControlTexture, this, "onscreen_control_knob.png", 128, 0);
 
 			this.mEngine.getTextureManager().loadTextures(this.spriteTexture, 
@@ -160,7 +160,7 @@ public class pbvs extends BaseGameActivity {
 			boolean run = true;
 			
 			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXval, final float controlYVal ) {
-				physicsHandler.setVelocity(controlXval * 0, controlYVal * 100); //when controls are idle the values = 0
+				//physicsHandler.setVelocity(controlXval * 0, controlYVal * 100); //when controls are idle the values = 0
 				
 				if(controlXval > 0)
 				{
@@ -218,7 +218,7 @@ public class pbvs extends BaseGameActivity {
 		});
 		digitalOnScreenControl.getControlBase().setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		digitalOnScreenControl.getControlBase().setAlpha(0.75f);
-		digitalOnScreenControl.getControlBase().setScaleCenter(0, 128);
+		digitalOnScreenControl.getControlBase().setScaleCenter(0, 32);
 		digitalOnScreenControl.getControlBase().setScale(1.50f);
 		digitalOnScreenControl.getControlKnob().setScale(00f);
 		digitalOnScreenControl.refreshControlKnobPosition();
