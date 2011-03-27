@@ -73,7 +73,7 @@ public class pbvs extends BaseGameActivity {
 
 	public void onLoadResources() {
 			this.spriteTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
-			this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.spriteTexture, this, "gfx/player_possible.png", 0, 0, 3, 4);
+			this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.spriteTexture, this, "gfx/player.png", 0, 0, 3, 4);
 			/*
 			 * createTiledFromAsset gets a asset, and cuts it into rows and columns.  in this case, 3 is the rows, 4 is the columns
 			 */
