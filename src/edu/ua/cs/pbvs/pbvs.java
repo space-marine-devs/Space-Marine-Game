@@ -198,7 +198,6 @@ public class pbvs extends BaseGameActivity {
 			
 			levelLoaderObj.registerEntityLoader(LevelConstants.TAG_LEVEL, 
 				new IEntityLoader() {
-					@Override
 					public void onLoadEntity(final String pEntityName, final Attributes pAttributes) {
 						final int width = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_WIDTH);
 						final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_HEIGHT);
@@ -209,7 +208,6 @@ public class pbvs extends BaseGameActivity {
 
 			levelLoaderObj.registerEntityLoader(TAG_ENTITY, 
 				new IEntityLoader() {
-					@Override
 					public void onLoadEntity(final String pEntityName, final Attributes pAttributes) {
 						final int x = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_X);
 						final int y = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_Y);
