@@ -135,7 +135,7 @@ public class pbvs extends BaseGameActivity {
 	{
 			final AnimatedSprite nSprite = new AnimatedSprite(x, y, texture);
 			nSprite.setScaleCenterY(texture.getTileHeight());
-			nSprite.setScale(2);
+			nSprite.setScale(4);
 			//nSprite.animate(100);
 			return nSprite;
 	}
