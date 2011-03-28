@@ -183,6 +183,39 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			scene.setChildScene(digitalOnScreenControl);
 			//adds them to the scene
 			
+<<<<<<< HEAD
+=======
+			levelLoaderObj.registerEntityLoader(LevelConstants.TAG_LEVEL, 
+				new IEntityLoader() {
+					public void onLoadEntity(final String pEntityName, final Attributes pAttributes) {
+						final int width = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_WIDTH);
+						final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_HEIGHT);
+						Toast.makeText(pbvs.this, "Loaded level with width=" + width + " and height=" + height + ".", Toast.LENGTH_LONG).show();
+					}
+				}
+			);
+
+			levelLoaderObj.registerEntityLoader(TAG_ENTITY, 
+				new IEntityLoader() {
+					public void onLoadEntity(final String pEntityName, final Attributes pAttributes) {
+						final int x = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_X);
+						final int y = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_Y);
+						final int width = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_WIDTH);
+						final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_HEIGHT);
+						final String type = SAXUtils.getAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_TYPE);
+		
+								
+						if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_METALBOX)) 
+						{
+							Sprite face = new Sprite(x, y, width, height, pbvs.this.facebox);
+							Toast.makeText(pbvs.this, "Thing loaded with x=" + x + " and y" + y + ".", Toast.LENGTH_LONG).show();
+							scene.getLastChild().attachChild(face);
+						}
+					}
+				}
+			);
+			
+>>>>>>> 3a30ef5c215074c3fd05057050de48ecefcd36fe
 			try {
 				levelLoaderObj.loadLevelFromAsset(this, "example2.lvl");
 			} catch (final IOException e) {
