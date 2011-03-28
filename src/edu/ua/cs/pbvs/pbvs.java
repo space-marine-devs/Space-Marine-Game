@@ -47,6 +47,8 @@ import android.hardware.SensorManager;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 
@@ -86,12 +88,13 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	private TextureRegion mOnScreenButtonKnobTextureRegion;
 	
 	private PhysicsWorld mPhysicsWorld;
-	private PhysicsWorld mPlayerPhysicsWorld;
 	
 	private Shape ground;
 	private Shape roof;
 	private Shape left;
 	private Shape right;
+	
+	private AnimatedSprite player;
 	
 	private boolean jumping = true;
 	
@@ -110,6 +113,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	private static final String TAG_ENTITY_ATTRIBUTE_HEIGHT = "height";
 	private static final String TAG_ENTITY_ATTRIBUTE_TYPE = "type";
 	
+	private ContactListener contactListener;
 	/*
 	 * Here are the XML object types
 	 */
@@ -141,13 +145,14 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture,
 					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture );
 			
+			 
+			
 	}
 
 	public Scene onLoadScene() {
 			final LevelLoader levelLoaderObj = new LevelLoader() ;
 			levelLoaderObj.setAssetBasePath("level/");
 			this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);	
-			this.mPlayerPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);	
 
 
 			
@@ -162,7 +167,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			final int playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
 			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
 			
-			final AnimatedSprite player = this.makePlayer(playerX, playerY, this.mPlayerTextureRegion, scene);
+			player = this.makePlayer(playerX, playerY, this.mPlayerTextureRegion, scene);
 			this.mCamera.setChaseEntity(player);
 			
 			this.makeSprite(playerX+200, playerY+200, this.metalBoxTextureRegion, scene);
@@ -189,19 +194,13 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 				Debug.e(e);
 			}
 			
-			final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(0, 0.5f, 0.5f);
+			final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(0, 0f, 0.5f);
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, ground, BodyType.StaticBody, wallFixtureDef);
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, roof, BodyType.StaticBody, wallFixtureDef);
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, left, BodyType.StaticBody, wallFixtureDef);
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, right, BodyType.StaticBody, wallFixtureDef);
-            PhysicsFactory.createBoxBody(this.mPlayerPhysicsWorld, ground, BodyType.StaticBody, wallFixtureDef);
-            PhysicsFactory.createBoxBody(this.mPlayerPhysicsWorld, roof, BodyType.StaticBody, wallFixtureDef);
-            PhysicsFactory.createBoxBody(this.mPlayerPhysicsWorld, left, BodyType.StaticBody, wallFixtureDef);
-            PhysicsFactory.createBoxBody(this.mPlayerPhysicsWorld, right, BodyType.StaticBody, wallFixtureDef);
             scene.registerUpdateHandler(this.mPhysicsWorld);
-            scene.registerUpdateHandler(this.mPlayerPhysicsWorld);
 			
-
 			return scene;
 	}
 
@@ -223,12 +222,25 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	{
 		final Body body;
 		final AnimatedSprite nSprite = this.makeAnimatedSprite(x, y, texture, scene);
-		
-		
-		body = PhysicsFactory.createBoxBody(this.mPlayerPhysicsWorld, nSprite, BodyType.DynamicBody, FIXTURE_DEF);
-        this.mPlayerPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(nSprite, body, true, true));
+	    final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
+		body = PhysicsFactory.createBoxBody(this.mPhysicsWorld, nSprite, BodyType.DynamicBody, FIXTURE_DEF);
+        this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(nSprite, body, true, true));
 		scene.getLastChild().attachChild(nSprite);
+		body.setAngularDamping(2000000000);
 		return nSprite;
+	}
+	
+	
+	private Sprite makeSprite(int x, int y, TextureRegion texture, Scene scene )
+	{
+			final Body body;
+			final Sprite nSprite = new Sprite(x, y, texture);
+			nSprite.setScaleCenterY(texture.getHeight());
+			nSprite.setScale(2);
+			body = PhysicsFactory.createBoxBody(this.mPhysicsWorld, nSprite, BodyType.DynamicBody, FIXTURE_DEF);
+            this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(nSprite, body, true, true));
+			scene.getLastChild().attachChild(nSprite);
+			return nSprite;
 	}
 	
 	private AnimatedSprite makeAS(int x, int y, TiledTextureRegion texture, Scene scene )
@@ -238,18 +250,6 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
         this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(nSprite, body, true, true));
 		scene.getLastChild().attachChild(nSprite);
 		return nSprite;
-	}
-	
-	private Sprite makeSprite(int x, int y, TextureRegion texture, Scene scene )
-	{
-			final Body body;
-			final Sprite nSprite = new Sprite(x, y, texture);
-			nSprite.setScaleCenterY(texture.getHeight());
-			nSprite.setScale(2);
-			body = PhysicsFactory.createBoxBody(this.mPhysicsWorld, nSprite, BodyType.DynamicBody, FIXTURE_DEF);
-			scene.getLastChild().attachChild(nSprite);
-            this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(nSprite, body, true, true));
-			return nSprite;
 	}
 	
 	private ParallaxBackground loadmanualParallax()
@@ -272,8 +272,9 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			boolean run = true;
 			
 			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXVal, final float controlYVal ) {
-				physicsHandler.setVelocity(controlXVal * 100, controlYVal * 100); //when controls are idle the values = 0
+				//physicsHandler.setVelocity(controlXVal * 100, controlYVal * 100); //when controls are idle the values = 0
 				
+		        Vector2 playerMove = Vector2Pool.obtain(10*controlXVal,10*controlYVal);
 				if(controlXVal > 0)
 				{
 					if (!(dir > 0))
@@ -284,7 +285,9 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					{
 						dir = 1;
 						player.animate(new long[]{150, 150, 150}, 3, 5, 1);
+						
 						runCount = 0;
+						
 						run = false;
 					}
 					else
@@ -325,14 +328,23 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 				{
 					player.stopAnimation();
 				}
-				paraBack.setParallaxValue((float)this.count/4);
+				//paraBack.setParallaxValue((float)this.count/4);
+				Body playerBody = mPhysicsWorld.getPhysicsConnectorManager().findBodyByShape(player);
+				playerBody.setLinearVelocity(playerMove);
+				//playerBody.setLinearVelocity(playerMove, new Vector2(0,0));
+		        playerBody.setAngularVelocity(0f);
 			}
 		});
 		final DigitalOnScreenControl rightControl = new DigitalOnScreenControl(CAMERA_WIDTH - (this.mOnScreenButtonBaseTextureRegion.getWidth()+135), CAMERA_HEIGHT - this.mOnScreenButtonBaseTextureRegion.getHeight(), this.mCamera, this.mOnScreenButtonBaseTextureRegion, this.mOnScreenButtonKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
 			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXVal, final float controlYVal ) {
-				physicsHandler.setVelocity(controlXVal * 1000, controlYVal * 1000); //when controls are idle the values = 0
-					//if (controlXVal != 0)
-						//player.animate(new long[]{1, 1, 1}, 9, 11, 1);
+				if (controlXVal != 0f)
+				{
+					jump(player);
+				}
+				if (player.collidesWith(ground))
+				{
+					jumping= true;
+				}
 				
 			}
 		});
@@ -358,7 +370,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	private void prepSpriteTextures()
 	{
-		this.playerTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.playerTexture = new Texture(128, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
@@ -430,10 +442,15 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	}
 	
 	public void jump(AnimatedSprite sprite){
-		 final Body faceBody = this.mPhysicsWorld.getPhysicsConnectorManager().findBodyByShape(sprite);
+		
+		 final Body playerBody = this.mPhysicsWorld.getPhysicsConnectorManager().findBodyByShape(sprite);
 
-         final Vector2 velocity = Vector2Pool.obtain(this.mGravityX * -50, this.mGravityY * -50);
-         faceBody.setLinearVelocity(velocity);
+         final Vector2 velocity = Vector2Pool.obtain(0, -100);
+         if (jumping)
+         {
+	         playerBody.applyLinearImpulse (velocity, playerBody.getLocalCenter());
+	         jumping = false;
+         }
          Vector2Pool.recycle(velocity);
         }
 	// ===========================================================
@@ -451,8 +468,18 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
          this.mGravityY = pAccelerometerData.getX();
 
          final Vector2 gravity = Vector2Pool.obtain(this.mGravityX, this.mGravityY);
+         final Vector2 playerGravity = Vector2Pool.obtain(0, SensorManager.GRAVITY_EARTH);
          this.mPhysicsWorld.setGravity(gravity);
+         
+		 final Body playerBody = this.mPhysicsWorld.getPhysicsConnectorManager().findBodyByShape(player);
+
+         //playerBody.applyLinearImpulse(playerGravity, new Vector2(player.getHeightScaled()/2, player.getWidthScaled()/2));
+         playerBody.applyLinearImpulse(playerGravity, new Vector2( 0, 0 ));
+         playerBody.setAngularVelocity(0f);
+         playerBody.setAngularVelocity(0f);
+         
          Vector2Pool.recycle(gravity);
+         Vector2Pool.recycle(playerGravity);
 		
 	}
 }
