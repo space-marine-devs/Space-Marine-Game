@@ -13,23 +13,17 @@ import org.anddev.andengine.engine.handler.physics.PhysicsHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
-import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.scene.background.ParallaxBackground;
 import org.anddev.andengine.entity.scene.background.ParallaxBackground.ParallaxEntity;
 import org.anddev.andengine.entity.shape.Shape;
-import org.anddev.andengine.entity.sprite.AnimatedSprite;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.util.FPSLogger;
-import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
 import org.anddev.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.anddev.andengine.input.touch.TouchEvent;
-import org.anddev.andengine.level.LevelLoader;
-import org.anddev.andengine.level.LevelLoader.IEntityLoader;
-import org.anddev.andengine.level.util.constants.LevelConstants;
 import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
@@ -39,16 +33,12 @@ import org.anddev.andengine.sensor.accelerometer.AccelerometerData;
 import org.anddev.andengine.sensor.accelerometer.IAccelerometerListener;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 import org.anddev.andengine.util.Debug;
-import org.anddev.andengine.util.SAXUtils;
-import org.xml.sax.Attributes;
 
 import android.hardware.SensorManager;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 
@@ -64,39 +54,37 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	// ===========================================================
 	// Fields
 	// ===========================================================
-    private static final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 
 	private BoundCamera mCamera;
 
-	private Texture scaffoldTexture;  //I think this is like a texture container.  or something.
-	private Texture playerTexture;  //I think this is like a texture container.  or something.
-	private TextureRegion metalBoxTextureRegion; // player texture
-	private TiledTextureRegion mPlayerTextureRegion; // player texture
+	public Texture scaffoldTexture;  //I think this is like a texture container.  or something.
+	public TextureRegion metalBoxTextureRegion; // player texture
+	public Texture playerTexture;  //I think this is like a texture container.  or something.
+	public TiledTextureRegion mPlayerTextureRegion; // player texture
 
-	private Texture mAutoParallaxBackgroundTexture;
+	public Texture mAutoParallaxBackgroundTexture;
 
-	private TextureRegion mParallaxLayerBack;  //parallax textures
-	private TextureRegion mParallaxLayerMid;
-	private TextureRegion mParallaxLayerFront;
+	public TextureRegion mParallaxLayerBack;  //parallax textures
+	public TextureRegion mParallaxLayerMid;
+	public TextureRegion mParallaxLayerFront;
 	
-	private Texture mOnScreenControlTexture;  //button thing
-	private TextureRegion mOnScreenControlBaseTextureRegion;
-	private TextureRegion mOnScreenControlKnobTextureRegion;
+	public Texture mOnScreenControlTexture;  //button thing
+	public TextureRegion mOnScreenControlBaseTextureRegion;
+	public TextureRegion mOnScreenControlKnobTextureRegion;
 	
-	private Texture mOnScreenButtonTexture;  //button thing
-	private TextureRegion mOnScreenButtonBaseTextureRegion;
-	private TextureRegion mOnScreenButtonKnobTextureRegion;
+	public Texture mOnScreenButtonTexture;  //button thing
+	public TextureRegion mOnScreenButtonBaseTextureRegion;
+	public TextureRegion mOnScreenButtonKnobTextureRegion;
 	
-	private PhysicsWorld mPhysicsWorld;
+	public PhysicsWorld mPhysicsWorld;
 	
-	private Shape ground;
-	private Shape roof;
-	private Shape left;
-	private Shape right;
+	public Shape ground;
+	public Shape roof;
+	public Shape left;
+	public Shape right;
 	
-	private AnimatedSprite player;
+	private Player player;
 	
-	private boolean jumping = true;
 	
 	private float mGravityX;
 	private float mGravityY;
@@ -106,18 +94,10 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	/*
 	 * Here are the xml attributes.
 	 */
-	private static final String TAG_ENTITY = "entity";
-	private static final String TAG_ENTITY_ATTRIBUTE_X = "x";
-	private static final String TAG_ENTITY_ATTRIBUTE_Y = "y";
-	private static final String TAG_ENTITY_ATTRIBUTE_WIDTH = "width";
-	private static final String TAG_ENTITY_ATTRIBUTE_HEIGHT = "height";
-	private static final String TAG_ENTITY_ATTRIBUTE_TYPE = "type";
 	
-	private ContactListener contactListener;
 	/*
 	 * Here are the XML object types
 	 */
-	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_METALBOX = "metalbox";
 
 	// ===========================================================
 	// Constructors
@@ -150,35 +130,32 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	}
 
 	public Scene onLoadScene() {
-			final LevelLoader levelLoaderObj = new LevelLoader() ;
-			levelLoaderObj.setAssetBasePath("level/");
 			this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);	
-
-
 			
 			this.mEngine.registerUpdateHandler(new FPSLogger());
 			
 
 			final Scene scene = new Scene(1);
 			
-			this.loadLevel(levelLoaderObj, scene);
+			final LevelLoaderWrapper levelLoaderObj = new LevelLoaderWrapper(this, scene);
 			
 			/* Calculate the coordinates for the face(do you mean player?), so its centered on the camera. */
 			final int playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
 			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
 			
-			player = this.makePlayer(playerX, playerY, this.mPlayerTextureRegion, scene);
+			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld);
+			scene.getLastChild().attachChild(player);
 			this.mCamera.setChaseEntity(player);
 			
-			this.makeSprite(playerX+200, playerY+200, this.metalBoxTextureRegion, scene);
-			this.makeSprite(playerX-200, playerY+200, this.metalBoxTextureRegion, scene);
-			this.makeSprite(playerX+200, playerY-200, this.metalBoxTextureRegion, scene);
-			this.makeSprite(playerX-200, playerY-200, this.metalBoxTextureRegion, scene);
+			scene.getLastChild().attachChild(new PhysicsSprite(playerX+200, playerY+200, this.metalBoxTextureRegion, this.mPhysicsWorld));
+			scene.getLastChild().attachChild(new PhysicsSprite(playerX-200, playerY+200, this.metalBoxTextureRegion, this.mPhysicsWorld));
+			scene.getLastChild().attachChild(new PhysicsSprite(playerX+200, playerY-200, this.metalBoxTextureRegion, this.mPhysicsWorld));
+			scene.getLastChild().attachChild(new PhysicsSprite(playerX-200, playerY-200, this.metalBoxTextureRegion, this.mPhysicsWorld));
 			
 			final PhysicsHandler controlHandler = new PhysicsHandler(player);
 			player.registerUpdateHandler(controlHandler);  //this is the thing that the controls control.
 			
-			final ParallaxBackground paraBack = this.loadmanualParallax();
+			final ParallaxBackground paraBack = this.loadManualParallax();
 			scene.setBackground( paraBack );  
 			
 			
@@ -211,48 +188,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	private AnimatedSprite makeAnimatedSprite(int x, int y, TiledTextureRegion texture, Scene scene )
-	{
-			final AnimatedSprite nSprite = new AnimatedSprite(x, y, texture);
-			nSprite.setScaleCenterY(texture.getTileHeight());
-			nSprite.setScale(2);
-			return nSprite;
-	}
-	private AnimatedSprite makePlayer(int x, int y, TiledTextureRegion texture, Scene scene )
-	{
-		final Body body;
-		final AnimatedSprite nSprite = this.makeAnimatedSprite(x, y, texture, scene);
-	    final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
-		body = PhysicsFactory.createBoxBody(this.mPhysicsWorld, nSprite, BodyType.DynamicBody, FIXTURE_DEF);
-        this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(nSprite, body, true, true));
-		scene.getLastChild().attachChild(nSprite);
-		body.setAngularDamping(2000000000);
-		return nSprite;
-	}
 	
-	
-	private Sprite makeSprite(int x, int y, TextureRegion texture, Scene scene )
-	{
-			final Body body;
-			final Sprite nSprite = new Sprite(x, y, texture);
-			nSprite.setScaleCenterY(texture.getHeight());
-			nSprite.setScale(2);
-			body = PhysicsFactory.createBoxBody(this.mPhysicsWorld, nSprite, BodyType.DynamicBody, FIXTURE_DEF);
-            this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(nSprite, body, true, true));
-			scene.getLastChild().attachChild(nSprite);
-			return nSprite;
-	}
-	
-	private AnimatedSprite makeAS(int x, int y, TiledTextureRegion texture, Scene scene )
-	{
-		final AnimatedSprite nSprite = this.makeAnimatedSprite(x, y, texture, scene);
-		final Body body = PhysicsFactory.createBoxBody(this.mPhysicsWorld, nSprite, BodyType.DynamicBody, FIXTURE_DEF);
-        this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(nSprite, body, true, true));
-		scene.getLastChild().attachChild(nSprite);
-		return nSprite;
-	}
-	
-	private ParallaxBackground loadmanualParallax()
+	private ParallaxBackground loadManualParallax()
 	{
 		final ParallaxBackground ParallaxBackground = new ParallaxBackground(0, 0, 0);
 		ParallaxBackground.attachParallaxEntity(new ParallaxEntity(0.0f, new Sprite(0, CAMERA_HEIGHT - this.mParallaxLayerBack.getHeight(), this.mParallaxLayerBack)));
@@ -262,8 +199,11 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		return ParallaxBackground;
 	}
 	
-	private DigitalOnScreenControl loadControl( final PhysicsHandler physicsHandler, final ParallaxBackground paraBack, final AnimatedSprite player)
+	private DigitalOnScreenControl loadControl( final PhysicsHandler physicsHandler, final ParallaxBackground paraBack, final Player player)
 	{
+		
+		
+		//TODO I vote we keep this in here until
 
 		final DigitalOnScreenControl digitalOnScreenControl = new DigitalOnScreenControl(0, CAMERA_HEIGHT - this.mOnScreenControlBaseTextureRegion.getHeight(), this.mCamera, this.mOnScreenControlBaseTextureRegion, this.mOnScreenControlKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
 			float count = 0;
@@ -339,11 +279,11 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXVal, final float controlYVal ) {
 				if (controlXVal != 0f)
 				{
-					jump(player);
+					player.jump();
 				}
 				if (player.collidesWith(ground))
 				{
-					jumping= true;
+					player.setJump();
 				}
 				
 			}
@@ -393,66 +333,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		this.mOnScreenButtonKnobTextureRegion = TextureRegionFactory.createFromAsset(this.mOnScreenButtonTexture, this, "onscreen_control_knob.png", 128, 0);
 	}
 	
-	private void loadLevel(LevelLoader levelLoaderObj, final Scene scene )
-	{
-		levelLoaderObj.registerEntityLoader(LevelConstants.TAG_LEVEL, 
-			new IEntityLoader() {
-				public void onLoadEntity(final String pEntityName, final Attributes pAttributes) {
-					final int width = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_WIDTH);
-					final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_HEIGHT);
-					//Toast.makeText(pbvs.this, "Loaded level with width=" + width + " and height=" + height + ".", Toast.LENGTH_LONG).show();
-					
-					ground = new Rectangle(-3200, height, width+3200, 3200);
-					roof   = new Rectangle(-3200, -3200, width+3200, 3200);
-					left   = new Rectangle(-3200, -3200, 3200, height+6400);
-					right  = new Rectangle(width, -3200, 3200, 6400);
-		            ground.setColor(.20f, .20f, .20f);
-		            roof.setColor  (.20f, .20f, .20f);
-		            left.setColor  (.20f, .20f, .20f);
-		            right.setColor (.20f, .20f, .20f);
-		            
-					scene.getLastChild().attachChild(ground);
-					scene.getLastChild().attachChild(roof);
-					scene.getLastChild().attachChild(left);
-					scene.getLastChild().attachChild(right);
-		            
-				}
-			}
-		);
-
-		levelLoaderObj.registerEntityLoader(TAG_ENTITY, 
-			new IEntityLoader() {
-				public void onLoadEntity(final String pEntityName, final Attributes pAttributes) {
-					final int x = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_X);
-					final int y = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_Y);
-					final int width = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_WIDTH);
-					final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_HEIGHT);
-					final String type = SAXUtils.getAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_TYPE);
 	
-							
-					Sprite spr;
-					if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_METALBOX)) 
-					{
-						spr = new Sprite(x, y, width, height, pbvs.this.metalBoxTextureRegion);
-						scene.getLastChild().attachChild(spr);
-					}
-				}
-			}
-		);
-	}
-	
-	public void jump(AnimatedSprite sprite){
-		
-		 final Body playerBody = this.mPhysicsWorld.getPhysicsConnectorManager().findBodyByShape(sprite);
-
-         final Vector2 velocity = Vector2Pool.obtain(0, -100);
-         if (jumping)
-         {
-	         playerBody.applyLinearImpulse (velocity, playerBody.getLocalCenter());
-	         jumping = false;
-         }
-         Vector2Pool.recycle(velocity);
-        }
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================	
@@ -467,7 +348,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		 this.mGravityX = pAccelerometerData.getY();
          this.mGravityY = pAccelerometerData.getX();
 
-         final Vector2 gravity = Vector2Pool.obtain(this.mGravityX, this.mGravityY);
+         final Vector2 gravity = Vector2Pool.obtain(this.mGravityX*2, this.mGravityY*2);
          final Vector2 playerGravity = Vector2Pool.obtain(0, SensorManager.GRAVITY_EARTH);
          this.mPhysicsWorld.setGravity(gravity);
          

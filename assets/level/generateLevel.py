@@ -21,6 +21,9 @@ def addObject(x, y, typeObj=None):
 def level(width, height):
 	print("\t<level width=\"%s\" height=\"%s\">" % (width, height))
 	#addBorder(int(width), int(height))
+	addObject( 10, 10 )
+	addObject( 20, 20 )
+	addObject( 50, 50 )
 	print("</level>")
 		
 def main():
