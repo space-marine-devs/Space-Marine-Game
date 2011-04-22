@@ -20,6 +20,9 @@ import org.anddev.andengine.entity.scene.background.ParallaxBackground.ParallaxE
 import org.anddev.andengine.entity.shape.Shape;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.util.FPSLogger;
+import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
+import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
+import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
 import org.anddev.andengine.extension.physics.box2d.util.Vector2Pool;
@@ -35,6 +38,7 @@ import org.anddev.andengine.ui.activity.BaseGameActivity;
 import org.anddev.andengine.util.Debug;
 
 import android.hardware.SensorManager;
+import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -78,6 +82,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	public PhysicsWorld mPhysicsWorld;
 	
+	
 	public Shape ground;
 	public Shape roof;
 	public Shape left;
@@ -88,6 +93,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	private float mGravityX;
 	private float mGravityY;
+
+    private boolean mPlaceOnScreenControlsAtDifferentVerticalLocations = false;
 	
 	
 	
@@ -112,8 +119,25 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	// ===========================================================
 
 	public Engine onLoadEngine() {
-			this.mCamera = new BoundCamera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT); 
-			return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), this.mCamera));
+			this.mCamera = new BoundCamera(0, 30, CAMERA_WIDTH, CAMERA_HEIGHT+30); 
+			final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), this.mCamera));
+			 try {
+                 if(MultiTouch.isSupported(this)) {
+                         engine.setTouchController(new MultiTouchController());
+                         if(MultiTouch.isSupportedDistinct(this)) {
+                                 Toast.makeText(this, "MultiTouch detected --> Both controls will work properly!", Toast.LENGTH_SHORT).show();
+                         } else {
+                                 this.mPlaceOnScreenControlsAtDifferentVerticalLocations = true;
+                                 Toast.makeText(this, "MultiTouch detected, but your device has problems distinguishing between fingers.\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
+                         }
+                 } else {
+                         Toast.makeText(this, "Sorry your device does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
+                 }
+         } catch (final MultiTouchException e) {
+                 Toast.makeText(this, "Sorry your Android Version does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
+         }
+
+         return engine;
 	}
 
 	public void onLoadResources() {
@@ -124,9 +148,6 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.prepControlTextures();
 			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture,
 					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture );
-			
-			 
-			
 	}
 
 	public Scene onLoadScene() {
@@ -147,10 +168,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			scene.getLastChild().attachChild(player);
 			this.mCamera.setChaseEntity(player);
 			
-			scene.getLastChild().attachChild(new PhysicsSprite(playerX+200, playerY+200, this.metalBoxTextureRegion, this.mPhysicsWorld));
-			scene.getLastChild().attachChild(new PhysicsSprite(playerX-200, playerY+200, this.metalBoxTextureRegion, this.mPhysicsWorld));
-			scene.getLastChild().attachChild(new PhysicsSprite(playerX+200, playerY-200, this.metalBoxTextureRegion, this.mPhysicsWorld));
-			scene.getLastChild().attachChild(new PhysicsSprite(playerX-200, playerY-200, this.metalBoxTextureRegion, this.mPhysicsWorld));
+			
 			
 			final PhysicsHandler controlHandler = new PhysicsHandler(player);
 			player.registerUpdateHandler(controlHandler);  //this is the thing that the controls control.
@@ -268,7 +286,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 				{
 					player.stopAnimation();
 				}
-				//paraBack.setParallaxValue((float)this.count/4);
+				//paraBack.setParallaxValue((float)this.count*4);
 				Body playerBody = mPhysicsWorld.getPhysicsConnectorManager().findBodyByShape(player);
 				playerBody.setLinearVelocity(playerMove);
 				//playerBody.setLinearVelocity(playerMove, new Vector2(0,0));
