@@ -12,7 +12,7 @@ public class Player extends PhysicsAnimatedSprite{
 	    //final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
 		this.setScale(3);
-		body.setAngularDamping(2000000000);
+		body.setAngularDamping(0);
 		// TODO Auto-generated constructor stub
 	}
 }

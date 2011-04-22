@@ -328,8 +328,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	private void prepSpriteTextures()
 	{
-		this.playerTexture = new Texture(128, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
-		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.playerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.scaffoldTexture = new Texture(64, 64, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
 	}
