@@ -94,6 +94,10 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	private float mGravityX;
 	private float mGravityY;
+	
+	private int playerX;
+	private int playerY;
+	private Scene scene;
 
     private boolean mPlaceOnScreenControlsAtDifferentVerticalLocations = false;
 	
@@ -157,13 +161,13 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.mEngine.registerUpdateHandler(new FPSLogger());
 			
 
-			final Scene scene = new Scene(1);
+			scene = new Scene(1);
 			
 			final LevelLoaderWrapper levelLoaderObj = new LevelLoaderWrapper(this, scene);
 			
 			/* Calculate the coordinates for the face(do you mean player?), so its centered on the camera. */
-			final int playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
-			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
+			playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
+			playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
 			
 			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld);
 			scene.getLastChild().attachChild(player);
@@ -296,13 +300,16 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		});
 		final DigitalOnScreenControl rightControl = new DigitalOnScreenControl(CAMERA_WIDTH - (this.mOnScreenButtonBaseTextureRegion.getWidth()+135), CAMERA_HEIGHT - this.mOnScreenButtonBaseTextureRegion.getHeight(), this.mCamera, this.mOnScreenButtonBaseTextureRegion, this.mOnScreenButtonKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
 			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXVal, final float controlYVal ) {
-				if (controlXVal != 0f)
+				if (controlXVal < 0f)
 				{
 					player.jump();
 				}
 				if (player.collidesWith(ground))
 				{
 					player.setJump();
+				}
+				if(controlXVal > 0f) {
+					scene.getLastChild().attachChild(new Bullet(playerX+5, playerY+5, mPlayerTextureRegion, mPhysicsWorld));
 				}
 				
 			}
