@@ -10,6 +10,7 @@ import org.xml.sax.Attributes;
 
 public class LevelLoaderWrapper extends LevelLoader {
 	
+	
 	/*
 	 * Here are the xml attributes.
 	 */

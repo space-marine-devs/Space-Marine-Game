@@ -27,7 +27,7 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 	}
 
 	public void jump(){
-		final Vector2 velocity = Vector2Pool.obtain(0, -25);
+		final Vector2 velocity = Vector2Pool.obtain(0, -40);
 		if (jumping)
 		{
 			body.applyLinearImpulse (velocity, body.getLocalCenter());

@@ -61,8 +61,9 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 	private BoundCamera mCamera;
 
-	public Texture scaffoldTexture;  //I think this is like a texture container.  or something.
-	public TextureRegion metalBoxTextureRegion; // player texture
+	public Texture scaffoldTexture;  
+	public TextureRegion metalBoxTextureRegion;
+	
 	public Texture playerTexture;  //I think this is like a texture container.  or something.
 	public TiledTextureRegion mPlayerTextureRegion; // player texture
 
@@ -232,7 +233,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXVal, final float controlYVal ) {
 				//physicsHandler.setVelocity(controlXVal * 100, controlYVal * 100); //when controls are idle the values = 0
 				
-		        Vector2 playerMove = Vector2Pool.obtain(10*controlXVal,10*controlYVal);
+		        Vector2 playerMove = Vector2Pool.obtain(15*controlXVal,0*controlYVal);
 				if(controlXVal > 0)
 				{
 					if (!(dir > 0))
@@ -328,18 +329,20 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	private void prepSpriteTextures()
 	{
-		this.playerTexture = new Texture(128, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.playerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
 	}
+	
 	private void prepParaBackground()
 	{
 		this.mAutoParallaxBackgroundTexture = new Texture(1024, 1024, TextureOptions.DEFAULT);  
 		this.mParallaxLayerFront = TextureRegionFactory.createFromAsset(this.mAutoParallaxBackgroundTexture, this, "parallax_background_layer_front.png", 0, 0);
-		this.mParallaxLayerBack = TextureRegionFactory.createFromAsset(this.mAutoParallaxBackgroundTexture, this, "parallax_background_layer_back.png", 0, 188);
+		this.mParallaxLayerBack = TextureRegionFactory.createFromAsset(this.mAutoParallaxBackgroundTexture, this, "newparallax_background_layer_back.png", 0, 188);
 		this.mParallaxLayerMid = TextureRegionFactory.createFromAsset(this.mAutoParallaxBackgroundTexture, this, "parallax_background_layer_mid.png", 0, 669);
 	}
+	
 	private void prepControlTextures()
 	{
 		this.mOnScreenControlTexture = new Texture(256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -363,6 +366,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 	public void onAccelerometerChanged(AccelerometerData pAccelerometerData) {
 		// TODO Auto-generated method stub
+		player.onUpdate(1);
 		 this.mGravityX = pAccelerometerData.getY();
          this.mGravityY = pAccelerometerData.getX();
 
