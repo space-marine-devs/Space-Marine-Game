@@ -433,24 +433,22 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 		@Override
 		public void beginContact(Contact contact) {
-			Fixture fixA = contact.getFixtureA();
-			Fixture fixB = contact.getFixtureB();
-			Body bodyA = fixA.getBody();
-			Body bodyB = fixB.getBody();
-			Object a;
-			Object b;
-			a = bodyA.getUserData();
-			b = bodyB.getUserData();
-			if(a instanceof Bullet) {
-				//bodyA.destroyFixture(fixA);
-				scene.getLastChild().detachChild((PhysicsAnimatedSprite) a);
-			}
-			if(b instanceof Bullet) {
-				//bodyB.destroyFixture(fixB);
-				scene.getLastChild().detachChild((PhysicsAnimatedSprite) b);
-			}
-			//force commit
-			
+			Body bodyA = contact.getFixtureA().getBody();
+			Body bodyB = contact.getFixtureB().getBody();
+			Object uda = bodyA.getUserData();
+			Object udb = bodyB.getUserData();
+			if(uda instanceof PhysicsData && udb instanceof PhysicsData) {
+				Object a = ((PhysicsData)uda).sprite;
+				Object b = ((PhysicsData)udb).sprite;
+				if(a instanceof Bullet) {
+					//mPhysicsWorld.unregisterPhysicsConnector(((PhysicsData)uda).connector);
+					scene.getLastChild().detachChild((PhysicsAnimatedSprite) a);
+				}
+				if(b instanceof Bullet) {
+					//mPhysicsWorld.unregisterPhysicsConnector(((PhysicsData)uda).connector);
+					scene.getLastChild().detachChild((PhysicsAnimatedSprite) b);
+				}
+			}			
 		}
 
 		@Override
