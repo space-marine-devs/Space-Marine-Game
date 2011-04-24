@@ -114,6 +114,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	private int playerX;
 	private int playerY;
 	private Scene scene;
+	
+	BaseGameActivity THIS = this;
 
 	
 	
@@ -431,26 +433,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 		@Override
 		public void beginContact(Contact contact) {
-			Body bodyA = contact.getFixtureA().getBody();
-			Body bodyB = contact.getFixtureB().getBody();
-			Object uda = bodyA.getUserData();
-			Object udb = bodyB.getUserData();
-			if(uda instanceof PhysicsData && udb instanceof PhysicsData) {
-				Object a = ((PhysicsData)uda).sprite;
-				Object b = ((PhysicsData)udb).sprite;
-				if(a instanceof Bullet) {
-					//PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape((PhysicsAnimatedSprite)a);
-					//mPhysicsWorld.unregisterPhysicsConnector(connect);
-					//mPhysicsWorld.destroyBody(connect.getBody());
-					//scene.getLastChild().detachChild((PhysicsAnimatedSprite) a);
-				}
-				if(b instanceof Bullet) {
-					//PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape((PhysicsAnimatedSprite)b);
-					//mPhysicsWorld.unregisterPhysicsConnector(connect);
-					//mPhysicsWorld.destroyBody(connect.getBody());
-					//scene.getLastChild().detachChild((PhysicsAnimatedSprite) b);
-				}
-			}
+			collision(contact);
 		}
 
 		@Override
@@ -459,6 +442,36 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			
 		}
 			
+	}
+	
+	private void collision(Contact contact) {
+		Body bodyA = contact.getFixtureA().getBody();
+		Body bodyB = contact.getFixtureB().getBody();
+		Object objA = bodyA.getUserData();
+		Object objB = bodyB.getUserData();
+		PhysicsData dataA = null;
+		PhysicsData dataB = null;
+		if(objA instanceof PhysicsData) {
+			dataA = (PhysicsData)objA;
+			PhysicsAnimatedSprite sp = dataA.sprite;
+			if(sp instanceof Bullet) {
+				//removePhysicsSprite(sp);
+			}
+		}
+		if(objB instanceof PhysicsData) {
+			dataB = (PhysicsData)objB;
+			PhysicsAnimatedSprite sp = dataB.sprite;
+			if(sp instanceof Bullet) {
+				//removePhysicsSprite(sp);
+			}
+		}
+	}
+	
+	private void removePhysicsSprite(PhysicsAnimatedSprite sp) {
+		PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(sp);
+		mPhysicsWorld.unregisterPhysicsConnector(connect);
+		mPhysicsWorld.destroyBody(connect.getBody());
+		scene.getLastChild().detachChild(sp);
 	}
 	
 }
