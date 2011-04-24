@@ -42,6 +42,10 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 	{
 		jumping = true;
 	}
+	
+	public void hit() {
+		
+	}
 }
 
 //force commit
