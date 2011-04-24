@@ -132,10 +132,10 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
                  if(MultiTouch.isSupported(this)) {
                          engine.setTouchController(new MultiTouchController());
                          if(MultiTouch.isSupportedDistinct(this)) {
-                                 Toast.makeText(this, "MultiTouch detected --> Both controls will work properly!", Toast.LENGTH_SHORT).show();
+                                 //Toast.makeText(this, "MultiTouch detected --> Both controls will work properly!", Toast.LENGTH_SHORT).show();
                          } else {
                                  this.mPlaceOnScreenControlsAtDifferentVerticalLocations = true;
-                                 Toast.makeText(this, "MultiTouch detected, but your device has problems distinguishing between fingers.\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
+                                 //Toast.makeText(this, "MultiTouch detected, but your device has problems distinguishing between fingers.\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
                          }
                  } else {
                          Toast.makeText(this, "Sorry your device does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
@@ -288,6 +288,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 						runCount++;
 					}
 					this.count-=1.50f;
+					player.dir = dir;
 				}
 				else
 				{
@@ -311,8 +312,9 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					player.setJump();
 				}
 				if(controlXVal > 0f) {
-					Bullet bullet = new Bullet(playerX, playerY, bulletTextureRegion, mPhysicsWorld);
+					Bullet bullet = new Bullet(player.getX()+5, player.getY()+5, bulletTextureRegion, mPhysicsWorld);
 					scene.getLastChild().attachChild(bullet);
+					bullet.shoot(player.dir);
 				}
 				
 			}
