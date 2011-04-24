@@ -458,23 +458,34 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			dataA = (PhysicsData)objA;
 			PhysicsAnimatedSprite sp = dataA.sprite;
 			if(sp instanceof Bullet) {
-				//removePhysicsSprite(sp);
+				this.runOnUpdateThread(new removePhysicsSprite(sp));
 			}
 		}
 		if(objB instanceof PhysicsData) {
 			dataB = (PhysicsData)objB;
 			PhysicsAnimatedSprite sp = dataB.sprite;
 			if(sp instanceof Bullet) {
-				//removePhysicsSprite(sp);
+				this.runOnUpdateThread(new removePhysicsSprite(sp));
 			}
 		}
 	}
 	
-	private void removePhysicsSprite(PhysicsAnimatedSprite sp) {
-		PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(sp);
-		mPhysicsWorld.unregisterPhysicsConnector(connect);
-		mPhysicsWorld.destroyBody(connect.getBody());
-		scene.getLastChild().detachChild(sp);
+	private class removePhysicsSprite implements Runnable {
+		private PhysicsAnimatedSprite sp;
+		public removePhysicsSprite(PhysicsAnimatedSprite sp) {
+			this.sp = sp;
+		}
+		public void run() {
+			try {
+			PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(sp);
+			mPhysicsWorld.unregisterPhysicsConnector(connect);
+			mPhysicsWorld.destroyBody(connect.getBody());
+			scene.getLastChild().detachChild(sp);
+			}
+			catch(NullPointerException e) {
+				return;
+			}
+		}
 	}
 	
 }
