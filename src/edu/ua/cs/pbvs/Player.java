@@ -30,6 +30,10 @@ public class Player extends PhysicsAnimatedSprite{
 			jumping = true;
 		}
 	}
+	
+	public void hit() {
+		//health--;
+	}
 	//force commit!
 	
 }

@@ -436,7 +436,12 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 		@Override
 		public void beginContact(Contact contact) {
-			collision(contact);
+			try {
+				collision(contact);
+			}
+			catch(NullPointerException e) {
+				return;
+			}
 		}
 
 		@Override
@@ -447,25 +452,33 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			
 	}
 	
-	private void collision(Contact contact) {
+	private void collision(Contact contact) throws NullPointerException {
 		Body bodyA = contact.getFixtureA().getBody();
 		Body bodyB = contact.getFixtureB().getBody();
 		Object objA = bodyA.getUserData();
 		Object objB = bodyB.getUserData();
 		PhysicsData dataA = null;
 		PhysicsData dataB = null;
+		PhysicsAnimatedSprite spriteA = null;
+		PhysicsAnimatedSprite spriteB = null;
 		if(objA instanceof PhysicsData) {
 			dataA = (PhysicsData)objA;
-			PhysicsAnimatedSprite sp = dataA.sprite;
-			if(sp instanceof Bullet) {
-				this.runOnUpdateThread(new removePhysicsSprite(sp));
-			}
+			spriteA = dataA.sprite;
 		}
 		if(objB instanceof PhysicsData) {
 			dataB = (PhysicsData)objB;
-			PhysicsAnimatedSprite sp = dataB.sprite;
-			if(sp instanceof Bullet) {
-				this.runOnUpdateThread(new removePhysicsSprite(sp));
+			spriteB = dataB.sprite;
+		}
+		if(spriteA instanceof Bullet) {
+			this.runOnUpdateThread(new removePhysicsSprite(spriteA));
+			if(spriteB instanceof PhysicsAnimatedSprite) {
+				spriteB.hit();
+			}
+		}
+		if(spriteB instanceof Bullet) {
+			this.runOnUpdateThread(new removePhysicsSprite(spriteB));
+			if(spriteA instanceof PhysicsAnimatedSprite) {
+				spriteA.hit();
 			}
 		}
 	}
