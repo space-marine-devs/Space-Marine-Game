@@ -249,6 +249,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					if (run)
 					{
 						dir = 1;
+						player.dir = dir;
 						player.animate(new long[]{150, 150, 150}, 3, 5, 1);
 						
 						runCount = 0;
@@ -274,6 +275,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					if (run)
 					{
 						dir = -1;
+						player.dir = dir;
 						player.animate(new long[]{150, 150, 150}, 9, 11, 1);
 						runCount = 0;
 						run = false;
@@ -288,7 +290,14 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 						runCount++;
 					}
 					this.count-=1.50f;
-					player.dir = dir;
+					/*
+					if(dir<0) {
+						player.dir = -1;
+					}
+					else {
+						player.dir = 1;
+					}
+					*/
 				}
 				else
 				{
@@ -312,7 +321,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					player.setJump();
 				}
 				if(controlXVal > 0f) {
-					Bullet bullet = new Bullet(player.getX()+5, player.getY()+5, bulletTextureRegion, mPhysicsWorld);
+					Bullet bullet = new Bullet(player.getX()+(player.dir*40), player.getY()-7, bulletTextureRegion, mPhysicsWorld);
 					scene.getLastChild().attachChild(bullet);
 					bullet.shoot(player.dir);
 				}

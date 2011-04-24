@@ -35,11 +35,7 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 		}
 		Vector2Pool.recycle(velocity);
 	}
-	public void shoot(int dir) {
-		final Vector2 velocity = Vector2Pool.obtain(dir*1000, 0);
-		body.applyLinearImpulse(velocity, body.getLocalCenter());
-		Vector2Pool.recycle(velocity);
-	}
+	
 	public void setJump()
 	{
 		jumping = true;
