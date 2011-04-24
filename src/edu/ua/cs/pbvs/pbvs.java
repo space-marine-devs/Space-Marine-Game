@@ -66,6 +66,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	public Texture playerTexture;  //I think this is like a texture container.  or something.
 	public TiledTextureRegion mPlayerTextureRegion; // player texture
+	public Texture bulletTexture;
+	public TiledTextureRegion bulletTextureRegion;
 
 	public Texture mAutoParallaxBackgroundTexture;
 
@@ -152,7 +154,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.prepParaBackground();
 			this.prepControlTextures();
 			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture,
-					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture );
+					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture, bulletTexture );
 	}
 
 	public Scene onLoadScene() {
@@ -309,7 +311,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					player.setJump();
 				}
 				if(controlXVal > 0f) {
-					scene.getLastChild().attachChild(new Bullet(playerX+5, playerY+5, mPlayerTextureRegion, mPhysicsWorld));
+					Bullet bullet = new Bullet(playerX+5, playerY+5, bulletTextureRegion, mPhysicsWorld);
+					scene.getLastChild().attachChild(bullet);
 				}
 				
 			}
@@ -340,6 +343,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
+		this.bulletTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.bulletTextureRegion = TextureRegionFactory.createTiledFromAsset(this.bulletTexture, this, "bullet.png", 0, 0, 3, 4);
 	}
 	
 	private void prepParaBackground()
