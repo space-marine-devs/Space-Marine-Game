@@ -13,6 +13,7 @@ import org.anddev.andengine.engine.handler.physics.PhysicsHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.anddev.andengine.entity.IEntity;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.scene.background.ParallaxBackground;
@@ -23,6 +24,7 @@ import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
 import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
+import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
 import org.anddev.andengine.extension.physics.box2d.util.Vector2Pool;
@@ -43,6 +45,9 @@ import android.widget.Toast;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 
@@ -63,6 +68,15 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 	public Texture scaffoldTexture;  
 	public TextureRegion metalBoxTextureRegion;
+	
+	public Texture block1X4Texture;
+	public TextureRegion block1X4TextureRegion;
+	
+	public Texture block4X1Texture;
+	public TextureRegion block4X1TextureRegion;
+	
+	public Texture endBlockTexture;
+	public TextureRegion endBlockTextureRegion;
 	
 	public Texture playerTexture;  //I think this is like a texture container.  or something.
 	public TiledTextureRegion mPlayerTextureRegion; // player texture
@@ -100,6 +114,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	private int playerX;
 	private int playerY;
 	private Scene scene;
+	
+	BaseGameActivity THIS = this;
 
     private boolean mPlaceOnScreenControlsAtDifferentVerticalLocations = false;
 	
@@ -154,11 +170,12 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.prepParaBackground();
 			this.prepControlTextures();
 			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture,
-					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture, bulletTexture );
+					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture, bulletTexture, this.block1X4Texture, this.block4X1Texture );
 	}
 
 	public Scene onLoadScene() {
-			this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);	
+			this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);
+			mPhysicsWorld.setContactListener(new ContactDetector());
 			
 			this.mEngine.registerUpdateHandler(new FPSLogger());
 			
@@ -169,7 +186,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			
 			/* Calculate the coordinates for the face(do you mean player?), so its centered on the camera. */
 			playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
-			playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
+			playerY = 0;
 			
 			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld);
 			scene.getLastChild().attachChild(player);
@@ -191,7 +208,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			//adds them to the scene
 			
 			try {
-				levelLoaderObj.loadLevelFromAsset(this, "example2.lvl");
+				levelLoaderObj.loadLevelFromAsset(this, "test.lvl");
 			} catch (final IOException e) {
 				Debug.e(e);
 			}
@@ -201,6 +218,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, roof, BodyType.StaticBody, wallFixtureDef);
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, left, BodyType.StaticBody, wallFixtureDef);
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, right, BodyType.StaticBody, wallFixtureDef);
+           
             scene.registerUpdateHandler(this.mPhysicsWorld);
 			
 			return scene;
@@ -249,6 +267,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					if (run)
 					{
 						dir = 1;
+						player.dir = dir;
 						player.animate(new long[]{150, 150, 150}, 3, 5, 1);
 						
 						runCount = 0;
@@ -274,6 +293,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					if (run)
 					{
 						dir = -1;
+						player.dir = dir;
 						player.animate(new long[]{150, 150, 150}, 9, 11, 1);
 						runCount = 0;
 						run = false;
@@ -288,7 +308,14 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 						runCount++;
 					}
 					this.count-=1.50f;
-					player.dir = dir;
+					/*
+					if(dir<0) {
+						player.dir = -1;
+					}
+					else {
+						player.dir = 1;
+					}
+					*/
 				}
 				else
 				{
@@ -312,7 +339,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					player.setJump();
 				}
 				if(controlXVal > 0f) {
-					Bullet bullet = new Bullet(player.getX()+5, player.getY()+5, bulletTextureRegion, mPhysicsWorld);
+					Bullet bullet = new Bullet(player.getX()+(player.dir*40), player.getY()-25, bulletTextureRegion, mPhysicsWorld);
 					scene.getLastChild().attachChild(bullet);
 					bullet.shoot(player.dir);
 				}
@@ -343,10 +370,15 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	{
 		this.playerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.block1X4Texture = new Texture(128, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.block4X1Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.bulletTexture = new Texture(32, 64, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		//this.block1X4Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
-		this.bulletTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.bulletTextureRegion = TextureRegionFactory.createTiledFromAsset(this.bulletTexture, this, "bullet.png", 0, 0, 3, 4);
+		this.block1X4TextureRegion = TextureRegionFactory.createFromAsset(this.block1X4Texture, this, "block4x1.png", 0, 0);
+		this.block4X1TextureRegion = TextureRegionFactory.createFromAsset(this.block4X1Texture, this, "block1x4.png", 0, 0);
+		this.bulletTextureRegion = TextureRegionFactory.createTiledFromAsset(this.bulletTexture, this, "newbullet.png", 0, 0, 1, 2);
 	}
 	
 	private void prepParaBackground()
@@ -399,4 +431,61 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
          Vector2Pool.recycle(playerGravity);
 		
 	}
+	
+	class ContactDetector implements ContactListener {
+
+		@Override
+		public void beginContact(Contact contact) {
+			collision(contact);
+		}
+
+		@Override
+		public void endContact(Contact contact) {
+			// TODO Auto-generated method stub
+			
+		}
+			
+	}
+	
+	private void collision(Contact contact) {
+		Body bodyA = contact.getFixtureA().getBody();
+		Body bodyB = contact.getFixtureB().getBody();
+		Object objA = bodyA.getUserData();
+		Object objB = bodyB.getUserData();
+		PhysicsData dataA = null;
+		PhysicsData dataB = null;
+		if(objA instanceof PhysicsData) {
+			dataA = (PhysicsData)objA;
+			PhysicsAnimatedSprite sp = dataA.sprite;
+			if(sp instanceof Bullet) {
+				this.runOnUpdateThread(new removePhysicsSprite(sp));
+			}
+		}
+		if(objB instanceof PhysicsData) {
+			dataB = (PhysicsData)objB;
+			PhysicsAnimatedSprite sp = dataB.sprite;
+			if(sp instanceof Bullet) {
+				this.runOnUpdateThread(new removePhysicsSprite(sp));
+			}
+		}
+	}
+	
+	private class removePhysicsSprite implements Runnable {
+		private PhysicsAnimatedSprite sp;
+		public removePhysicsSprite(PhysicsAnimatedSprite sp) {
+			this.sp = sp;
+		}
+		public void run() {
+			try {
+			PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(sp);
+			mPhysicsWorld.unregisterPhysicsConnector(connect);
+			mPhysicsWorld.destroyBody(connect.getBody());
+			scene.getLastChild().detachChild(sp);
+			}
+			catch(NullPointerException e) {
+				return;
+			}
+		}
+	}
+	
 }

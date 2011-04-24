@@ -2,11 +2,16 @@ package edu.ua.cs.pbvs;
 
 import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.Scene;
+import org.anddev.andengine.entity.sprite.Sprite;
+import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.level.LevelLoader;
 import org.anddev.andengine.level.util.constants.LevelConstants;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.util.SAXUtils;
 import org.xml.sax.Attributes;
+
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class LevelLoaderWrapper extends LevelLoader {
 	
@@ -25,6 +30,8 @@ public class LevelLoaderWrapper extends LevelLoader {
 	 * Here are the XML object types
 	 */
 	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_METALBOX = "metalbox";
+	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_4X1BLOCK = "4x1block";
+	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_1X4BLOCK = "1x4block";
 	LevelLoaderWrapper(final pbvs game, final Scene scene )
 	{
 		this.setAssetBasePath("level/");
@@ -63,16 +70,38 @@ public class LevelLoaderWrapper extends LevelLoader {
 					final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_HEIGHT);
 					final String type = SAXUtils.getAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_TYPE);
 	
-					TextureRegion temp;
+					TextureRegion temp = null;
+					boolean dynamic = false;
 					if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_METALBOX)) 
 					{
+						dynamic = true;
 						temp = game.metalBoxTextureRegion;
+					}
+					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_4X1BLOCK)) 
+					{
+						temp = game.block4X1TextureRegion;
+					}
+					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_1X4BLOCK)) 
+					{
+						temp = game.block1X4TextureRegion;
 					}
 					else
 					{
 						return;
 					}
-					scene.getLastChild().attachChild(new PhysicsSprite(x, y, width, height, temp, game.mPhysicsWorld));
+					if (!dynamic)
+					{
+						Sprite a = new Sprite (x, y+64, width, height, temp);
+						//TODO figure out how to make to make a static yet physics collidable object.
+						final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(0, 0f, 0.5f);
+			            PhysicsFactory.createBoxBody(game.mPhysicsWorld, a, BodyType.StaticBody, wallFixtureDef);
+						scene.getLastChild().attachChild(a);
+					}
+					else
+					{
+						PhysicsSprite a = new PhysicsSprite(x, y+64, width, height, temp, game.mPhysicsWorld);
+						scene.getLastChild().attachChild(a);
+					}
 				}
 			}
 		);
