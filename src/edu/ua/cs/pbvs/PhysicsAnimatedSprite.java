@@ -21,8 +21,9 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 		super(pX, pY, pTiledTextureRegion);
 	    final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
 		body = PhysicsFactory.createBoxBody(world, this, BodyType.DynamicBody, FIXTURE_DEF);
-		body.setUserData(this);
-        world.registerPhysicsConnector(new PhysicsConnector(this, body, true, true));
+		PhysicsConnector connect = new PhysicsConnector(this, body, true, true);
+        world.registerPhysicsConnector(connect);
+        body.setUserData(new PhysicsData(this, connect));
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
 		// TODO Auto-generated constructor stub
 	}

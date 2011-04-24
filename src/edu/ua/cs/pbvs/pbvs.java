@@ -24,6 +24,7 @@ import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
 import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
+import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
 import org.anddev.andengine.extension.physics.box2d.util.Vector2Pool;
@@ -430,24 +431,26 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 		@Override
 		public void beginContact(Contact contact) {
-			Fixture fixA = contact.getFixtureA();
-			Fixture fixB = contact.getFixtureB();
-			Body bodyA = fixA.getBody();
-			Body bodyB = fixB.getBody();
-			Object a;
-			Object b;
-			a = bodyA.getUserData();
-			b = bodyB.getUserData();
-			if(a instanceof Bullet) {
-				//bodyA.destroyFixture(fixA);
-				scene.getLastChild().detachChild((PhysicsAnimatedSprite) a);
+			Body bodyA = contact.getFixtureA().getBody();
+			Body bodyB = contact.getFixtureB().getBody();
+			Object uda = bodyA.getUserData();
+			Object udb = bodyB.getUserData();
+			if(uda instanceof PhysicsData && udb instanceof PhysicsData) {
+				Object a = ((PhysicsData)uda).sprite;
+				Object b = ((PhysicsData)udb).sprite;
+				if(a instanceof Bullet) {
+					//PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape((PhysicsAnimatedSprite)a);
+					//mPhysicsWorld.unregisterPhysicsConnector(connect);
+					//mPhysicsWorld.destroyBody(connect.getBody());
+					//scene.getLastChild().detachChild((PhysicsAnimatedSprite) a);
+				}
+				if(b instanceof Bullet) {
+					//PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape((PhysicsAnimatedSprite)b);
+					//mPhysicsWorld.unregisterPhysicsConnector(connect);
+					//mPhysicsWorld.destroyBody(connect.getBody());
+					//scene.getLastChild().detachChild((PhysicsAnimatedSprite) b);
+				}
 			}
-			if(b instanceof Bullet) {
-				//bodyB.destroyFixture(fixB);
-				scene.getLastChild().detachChild((PhysicsAnimatedSprite) b);
-			}
-			//force commit
-			
 		}
 
 		@Override
