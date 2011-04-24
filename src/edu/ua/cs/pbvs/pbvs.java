@@ -66,6 +66,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	public Texture playerTexture;  //I think this is like a texture container.  or something.
 	public TiledTextureRegion mPlayerTextureRegion; // player texture
+	public Texture bulletTexture;
+	public TiledTextureRegion bulletTextureRegion;
 
 	public Texture mAutoParallaxBackgroundTexture;
 
@@ -94,6 +96,10 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	private float mGravityX;
 	private float mGravityY;
+	
+	private int playerX;
+	private int playerY;
+	private Scene scene;
 
     private boolean mPlaceOnScreenControlsAtDifferentVerticalLocations = false;
 	
@@ -148,7 +154,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.prepParaBackground();
 			this.prepControlTextures();
 			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture,
-					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture );
+					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture, bulletTexture );
 	}
 
 	public Scene onLoadScene() {
@@ -157,13 +163,13 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.mEngine.registerUpdateHandler(new FPSLogger());
 			
 
-			final Scene scene = new Scene(1);
+			scene = new Scene(1);
 			
 			final LevelLoaderWrapper levelLoaderObj = new LevelLoaderWrapper(this, scene);
 			
 			/* Calculate the coordinates for the face(do you mean player?), so its centered on the camera. */
-			final int playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
-			final int playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
+			playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
+			playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
 			
 			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld);
 			scene.getLastChild().attachChild(player);
@@ -296,13 +302,17 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		});
 		final DigitalOnScreenControl rightControl = new DigitalOnScreenControl(CAMERA_WIDTH - (this.mOnScreenButtonBaseTextureRegion.getWidth()+135), CAMERA_HEIGHT - this.mOnScreenButtonBaseTextureRegion.getHeight(), this.mCamera, this.mOnScreenButtonBaseTextureRegion, this.mOnScreenButtonKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
 			public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, final float controlXVal, final float controlYVal ) {
-				if (controlXVal != 0f)
+				if (controlXVal < 0f)
 				{
 					player.jump();
 				}
 				if (player.collidesWith(ground))
 				{
 					player.setJump();
+				}
+				if(controlXVal > 0f) {
+					Bullet bullet = new Bullet(playerX+2, playerY+2, bulletTextureRegion, mPhysicsWorld);
+					scene.getLastChild().attachChild(bullet);
 				}
 				
 			}
@@ -333,6 +343,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
+		this.bulletTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.bulletTextureRegion = TextureRegionFactory.createTiledFromAsset(this.bulletTexture, this, "bullet.png", 0, 0, 3, 4);
 	}
 	
 	private void prepParaBackground()
