@@ -41,6 +41,7 @@ public class LevelLoaderWrapper extends LevelLoader {
 					game.right  = new Rectangle(width, -3200, 3200, 6400);
 		            game.ground.setColor(.20f, .20f, .20f);
 		            game.roof.setColor  (.20f, .20f, .20f);
+		            game.roof.setAlpha(0);
 		            game.left.setColor  (.20f, .20f, .20f);
 		            game.right.setColor (.20f, .20f, .20f);
 		            
