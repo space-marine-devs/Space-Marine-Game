@@ -449,6 +449,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 				//bodyB.destroyFixture(fixB);
 				scene.getLastChild().detachChild((PhysicsAnimatedSprite) b);
 			}
+			//sgfsdfs
 			
 		}
 
