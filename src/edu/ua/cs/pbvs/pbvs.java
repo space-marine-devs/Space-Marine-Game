@@ -141,10 +141,10 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
                  if(MultiTouch.isSupported(this)) {
                          engine.setTouchController(new MultiTouchController());
                          if(MultiTouch.isSupportedDistinct(this)) {
-                                 Toast.makeText(this, "MultiTouch detected --> Both controls will work properly!", Toast.LENGTH_SHORT).show();
+                                 //Toast.makeText(this, "MultiTouch detected --> Both controls will work properly!", Toast.LENGTH_SHORT).show();
                          } else {
                                  this.mPlaceOnScreenControlsAtDifferentVerticalLocations = true;
-                                 Toast.makeText(this, "MultiTouch detected, but your device has problems distinguishing between fingers.\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
+                                 //Toast.makeText(this, "MultiTouch detected, but your device has problems distinguishing between fingers.\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
                          }
                  } else {
                          Toast.makeText(this, "Sorry your device does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
@@ -258,6 +258,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					if (run)
 					{
 						dir = 1;
+						player.dir = dir;
 						player.animate(new long[]{150, 150, 150}, 3, 5, 1);
 						
 						runCount = 0;
@@ -283,6 +284,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					if (run)
 					{
 						dir = -1;
+						player.dir = dir;
 						player.animate(new long[]{150, 150, 150}, 9, 11, 1);
 						runCount = 0;
 						run = false;
@@ -297,6 +299,14 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 						runCount++;
 					}
 					this.count-=1.50f;
+					/*
+					if(dir<0) {
+						player.dir = -1;
+					}
+					else {
+						player.dir = 1;
+					}
+					*/
 				}
 				else
 				{
@@ -320,8 +330,9 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					player.setJump();
 				}
 				if(controlXVal > 0f) {
-					Bullet bullet = new Bullet(playerX+2, playerY+2, bulletTextureRegion, mPhysicsWorld);
+					Bullet bullet = new Bullet(player.getX()+(player.dir*40), player.getY()-25, bulletTextureRegion, mPhysicsWorld);
 					scene.getLastChild().attachChild(bullet);
+					bullet.shoot(player.dir);
 				}
 				
 			}
@@ -352,13 +363,13 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block1X4Texture = new Texture(128, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block4X1Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
-		this.bulletTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.bulletTexture = new Texture(32, 64, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		//this.block1X4Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
 		this.block1X4TextureRegion = TextureRegionFactory.createFromAsset(this.block1X4Texture, this, "block4x1.png", 0, 0);
 		this.block4X1TextureRegion = TextureRegionFactory.createFromAsset(this.block4X1Texture, this, "block1x4.png", 0, 0);
-		this.bulletTextureRegion = TextureRegionFactory.createTiledFromAsset(this.bulletTexture, this, "bullet.png", 0, 0, 3, 4);
+		this.bulletTextureRegion = TextureRegionFactory.createTiledFromAsset(this.bulletTexture, this, "newbullet.png", 0, 0, 1, 2);
 	}
 	
 	private void prepParaBackground()

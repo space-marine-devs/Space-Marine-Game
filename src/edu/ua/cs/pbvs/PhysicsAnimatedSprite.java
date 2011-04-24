@@ -35,6 +35,7 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 		}
 		Vector2Pool.recycle(velocity);
 	}
+	
 	public void setJump()
 	{
 		jumping = true;

@@ -1,11 +1,12 @@
 package edu.ua.cs.pbvs;
 
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
+import org.anddev.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class Bullet extends PhysicsAnimatedSprite{
-	public float health = 10;
-	public int jump_count = 0;
 
 
 	public Bullet(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world ) {
@@ -16,6 +17,12 @@ public class Bullet extends PhysicsAnimatedSprite{
 		this.body.setFixedRotation(true);
 		this.body.setBullet(true);
 		// TODO Auto-generated constructor stub
+	}
+	
+	public void shoot(int dir) {
+		final Vector2 velocity = Vector2Pool.obtain(dir*1000, 0);
+		body.applyLinearImpulse(velocity, body.getLocalCenter());
+		Vector2Pool.recycle(velocity);
 	}
 	
 }
