@@ -64,6 +64,15 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	public Texture scaffoldTexture;  
 	public TextureRegion metalBoxTextureRegion;
 	
+	public Texture block1X4Texture;
+	public TextureRegion block1X4TextureRegion;
+	
+	public Texture block4X1Texture;
+	public TextureRegion block4X1TextureRegion;
+	
+	public Texture endBlockTexture;
+	public TextureRegion endBlockTextureRegion;
+	
 	public Texture playerTexture;  //I think this is like a texture container.  or something.
 	public TiledTextureRegion mPlayerTextureRegion; // player texture
 	public Texture bulletTexture;
@@ -154,7 +163,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.prepParaBackground();
 			this.prepControlTextures();
 			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture,
-					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture, bulletTexture );
+					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture, bulletTexture, this.block1X4Texture, this.block4X1Texture );
 	}
 
 	public Scene onLoadScene() {
@@ -169,7 +178,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			
 			/* Calculate the coordinates for the face(do you mean player?), so its centered on the camera. */
 			playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
-			playerY = CAMERA_HEIGHT - this.mPlayerTextureRegion.getTileHeight() - 5;
+			playerY = 0;
 			
 			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld);
 			scene.getLastChild().attachChild(player);
@@ -191,7 +200,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			//adds them to the scene
 			
 			try {
-				levelLoaderObj.loadLevelFromAsset(this, "example2.lvl");
+				levelLoaderObj.loadLevelFromAsset(this, "test.lvl");
 			} catch (final IOException e) {
 				Debug.e(e);
 			}
@@ -341,9 +350,14 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	{
 		this.playerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.block1X4Texture = new Texture(128, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.block4X1Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.bulletTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		//this.block1X4Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
-		this.bulletTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.block1X4TextureRegion = TextureRegionFactory.createFromAsset(this.block1X4Texture, this, "block4x1.png", 0, 0);
+		this.block4X1TextureRegion = TextureRegionFactory.createFromAsset(this.block4X1Texture, this, "block1x4.png", 0, 0);
 		this.bulletTextureRegion = TextureRegionFactory.createTiledFromAsset(this.bulletTexture, this, "bullet.png", 0, 0, 3, 4);
 	}
 	
