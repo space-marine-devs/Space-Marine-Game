@@ -14,6 +14,7 @@ public class Bullet extends PhysicsAnimatedSprite{
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
 		this.setScale(3);
 		this.body.setFixedRotation(true);
+		this.body.setBullet(true);
 		// TODO Auto-generated constructor stub
 	}
 	
