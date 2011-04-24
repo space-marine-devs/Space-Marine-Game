@@ -13,6 +13,7 @@ import org.anddev.andengine.engine.handler.physics.PhysicsHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.anddev.andengine.entity.IEntity;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.scene.background.ParallaxBackground;
@@ -43,6 +44,9 @@ import android.widget.Toast;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 
@@ -158,7 +162,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	}
 
 	public Scene onLoadScene() {
-			this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);	
+			this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);
+			mPhysicsWorld.setContactListener(new ContactDetector());
 			
 			this.mEngine.registerUpdateHandler(new FPSLogger());
 			
@@ -201,6 +206,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, roof, BodyType.StaticBody, wallFixtureDef);
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, left, BodyType.StaticBody, wallFixtureDef);
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, right, BodyType.StaticBody, wallFixtureDef);
+           
             scene.registerUpdateHandler(this.mPhysicsWorld);
 			
 			return scene;
@@ -408,4 +414,36 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
          Vector2Pool.recycle(playerGravity);
 		
 	}
+	
+	class ContactDetector implements ContactListener {
+
+		@Override
+		public void beginContact(Contact contact) {
+			Fixture fixA = contact.getFixtureA();
+			Fixture fixB = contact.getFixtureB();
+			Body bodyA = fixA.getBody();
+			Body bodyB = fixB.getBody();
+			Object a;
+			Object b;
+			a = bodyA.getUserData();
+			b = bodyB.getUserData();
+			if(a instanceof Bullet) {
+				//bodyA.destroyFixture(fixA);
+				scene.getLastChild().detachChild((PhysicsAnimatedSprite) a);
+			}
+			if(b instanceof Bullet) {
+				//bodyB.destroyFixture(fixB);
+				scene.getLastChild().detachChild((PhysicsAnimatedSprite) b);
+			}
+			
+		}
+
+		@Override
+		public void endContact(Contact contact) {
+			// TODO Auto-generated method stub
+			
+		}
+			
+	}
+	
 }
