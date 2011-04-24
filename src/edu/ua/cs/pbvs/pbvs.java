@@ -24,6 +24,7 @@ import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
 import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
+import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
 import org.anddev.andengine.extension.physics.box2d.util.Vector2Pool;
@@ -441,14 +442,18 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 				Object a = ((PhysicsData)uda).sprite;
 				Object b = ((PhysicsData)udb).sprite;
 				if(a instanceof Bullet) {
-					//mPhysicsWorld.unregisterPhysicsConnector(((PhysicsData)uda).connector);
-					scene.getLastChild().detachChild((PhysicsAnimatedSprite) a);
+					//PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape((PhysicsAnimatedSprite)a);
+					//mPhysicsWorld.unregisterPhysicsConnector(connect);
+					//mPhysicsWorld.destroyBody(connect.getBody());
+					//scene.getLastChild().detachChild((PhysicsAnimatedSprite) a);
 				}
 				if(b instanceof Bullet) {
-					//mPhysicsWorld.unregisterPhysicsConnector(((PhysicsData)uda).connector);
-					scene.getLastChild().detachChild((PhysicsAnimatedSprite) b);
+					//PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape((PhysicsAnimatedSprite)b);
+					//mPhysicsWorld.unregisterPhysicsConnector(connect);
+					//mPhysicsWorld.destroyBody(connect.getBody());
+					//scene.getLastChild().detachChild((PhysicsAnimatedSprite) b);
 				}
-			}			
+			}
 		}
 
 		@Override
