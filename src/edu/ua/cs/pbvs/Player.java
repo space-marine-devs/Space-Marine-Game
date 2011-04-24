@@ -6,6 +6,7 @@ import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 public class Player extends PhysicsAnimatedSprite{
 	public float health = 10;
 	public int jump_count = 0;
+	public int dir = 0;
 
 
 	public Player(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world ) {
