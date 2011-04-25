@@ -207,6 +207,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			final PhysicsHandler controlHandler = new PhysicsHandler(player);
 			player.registerUpdateHandler(controlHandler);  //this is the thing that the controls control.
 			
+			
 			final ParallaxBackground paraBack = this.loadManualParallax();
 			scene.setBackground( paraBack );  
 			
@@ -234,6 +235,10 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             //create enemy
             ninja = new Enemy(player.getX()+100, player.getY(), this.ninjaTextureRegion, mPhysicsWorld, this);
 			scene.getLastChild().attachChild(ninja);
+			/*
+			final PhysicsHandler ch = new PhysicsHandler(ninja);
+			ninja.registerUpdateHandler(ch);
+			*/
             
 			
 			return scene;
@@ -339,8 +344,6 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 				//paraBack.setParallaxValue((float)this.count*4);
 				Body playerBody = mPhysicsWorld.getPhysicsConnectorManager().findBodyByShape(player);
 				playerBody.setLinearVelocity(playerMove);
-				//playerBody.setLinearVelocity(playerMove, new Vector2(0,0));
-		        playerBody.setAngularVelocity(0f);
 			}
 		});
 		final DigitalOnScreenControl rightControl = new DigitalOnScreenControl(CAMERA_WIDTH - (this.mOnScreenButtonBaseTextureRegion.getWidth()+135), CAMERA_HEIGHT - this.mOnScreenButtonBaseTextureRegion.getHeight(), this.mCamera, this.mOnScreenButtonBaseTextureRegion, this.mOnScreenButtonKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
