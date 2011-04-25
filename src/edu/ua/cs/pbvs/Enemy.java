@@ -1,5 +1,7 @@
 package edu.ua.cs.pbvs;
 
+import org.anddev.andengine.engine.handler.timer.ITimerCallback;
+import org.anddev.andengine.engine.handler.timer.TimerHandler;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
 import org.anddev.andengine.extension.physics.box2d.util.Vector2Pool;
@@ -24,7 +26,7 @@ public class Enemy extends PhysicsAnimatedSprite {
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
 		this.setScale(3);
 		this.body.setFixedRotation(true);
-		move(dir);
+		createTimeHandler();
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -37,22 +39,23 @@ public class Enemy extends PhysicsAnimatedSprite {
 	
 	public void move(int newDir) {
 		dir = newDir;
-		Vector2 vector = Vector2Pool.obtain(dir*20, 0);
-		world.getPhysicsConnectorManager().findBodyByShape(this).setLinearVelocity(vector);
+		Vector2 vector = Vector2Pool.obtain(dir*10, 0);
+		body.setLinearVelocity(vector);
 	}
 	
-	int pathLength = 15;
-	public void onUpdate(int pSecondsElapsed)
+	private void createTimeHandler()
 	{
-		if(!this.mIgnoreUpdate) {
-			this.onManagedUpdate(pSecondsElapsed);
-		}
-		pathLength++;
-		if(pathLength >= 15){
-			pathLength = 0;
-			dir *= -1;
-			move(dir);
-		}
-	}
+	        TimerHandler timerHandler;
+	       
+	        act.getEngine().registerUpdateHandler(timerHandler = new TimerHandler(5, new ITimerCallback()
+	        {                      
+	            public void onTimePassed(final TimerHandler pTimerHandler)
+	            {
+	            	dir *= -1;
+	            	move(dir);
+	            	createTimeHandler();
+	            }
+	        }));
+	}	
 
 }
