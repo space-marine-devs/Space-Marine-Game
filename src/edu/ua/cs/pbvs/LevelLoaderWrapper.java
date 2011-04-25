@@ -122,8 +122,7 @@ public class LevelLoaderWrapper extends LevelLoader {
 					}
 					else if ( npc )
 					{
-						
-						
+						//Enemy a = new Enemy (x, y+64, temp_tiled, game.mPhysicsWorld, game);
 						
 					}
 					else
