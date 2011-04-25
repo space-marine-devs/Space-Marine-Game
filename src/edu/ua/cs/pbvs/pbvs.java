@@ -188,7 +188,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
 			playerY = 0;
 			
-			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld);
+			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld, this);
 			scene.getLastChild().attachChild(player);
 			this.mCamera.setChaseEntity(player);
 			
@@ -470,22 +470,26 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			spriteB = dataB.sprite;
 		}
 		if(spriteA instanceof Bullet) {
-			this.runOnUpdateThread(new removePhysicsSprite(spriteA));
+			removePhysicsSprite(spriteA);
 			if(spriteB instanceof PhysicsAnimatedSprite) {
 				spriteB.hit();
 			}
 		}
 		if(spriteB instanceof Bullet) {
-			this.runOnUpdateThread(new removePhysicsSprite(spriteB));
+			removePhysicsSprite(spriteB);
 			if(spriteA instanceof PhysicsAnimatedSprite) {
 				spriteA.hit();
 			}
 		}
 	}
 	
-	private class removePhysicsSprite implements Runnable {
+	public void removePhysicsSprite(PhysicsAnimatedSprite sp) {
+		this.runOnUpdateThread(new RemovePhysicsSprite(sp));
+	}
+	
+	public class RemovePhysicsSprite implements Runnable {
 		private PhysicsAnimatedSprite sp;
-		public removePhysicsSprite(PhysicsAnimatedSprite sp) {
+		public RemovePhysicsSprite(PhysicsAnimatedSprite sp) {
 			this.sp = sp;
 		}
 		public void run() {
