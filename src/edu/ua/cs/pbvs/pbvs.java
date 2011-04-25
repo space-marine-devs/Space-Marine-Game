@@ -118,6 +118,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	public Shape right;
 	
 	private Player player;
+	private Enemy ninja;
 	
 	
 	private float mGravityX;
@@ -178,7 +179,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.prepSpriteTextures();
 			this.prepParaBackground();
 			this.prepControlTextures();
-			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture,
+			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture, this.ninjaTexture,
 					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture, bulletTexture, this.block1X4Texture, this.block4X1Texture );
 	}
 
@@ -197,7 +198,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
 			playerY = 0;
 			
-			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld);
+			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld, this);
 			scene.getLastChild().attachChild(player);
 			this.mCamera.setChaseEntity(player);
 			
@@ -229,6 +230,11 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, right, BodyType.StaticBody, wallFixtureDef);
            
             scene.registerUpdateHandler(this.mPhysicsWorld);
+            
+            //create enemy
+            ninja = new Enemy(player.getX()+100, player.getY(), this.ninjaTextureRegion, mPhysicsWorld, this);
+			scene.getLastChild().attachChild(ninja);
+            
 			
 			return scene;
 	}
@@ -383,6 +389,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		this.stockBrokerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.racerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		
+		this.ninjaTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block1X4Texture = new Texture(128, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block4X1Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
@@ -395,6 +402,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		this.racerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.racerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.ninjaTextureRegion = TextureRegionFactory.createTiledFromAsset(this.ninjaTexture, this, "ninja.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
 		this.block1X4TextureRegion = TextureRegionFactory.createFromAsset(this.block1X4Texture, this, "block4x1.png", 0, 0);
 		this.block4X1TextureRegion = TextureRegionFactory.createFromAsset(this.block4X1Texture, this, "block1x4.png", 0, 0);
@@ -456,7 +464,12 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 		@Override
 		public void beginContact(Contact contact) {
-			collision(contact);
+			try {
+				collision(contact);
+			}
+			catch(NullPointerException e) {
+				return;
+			}
 		}
 
 		@Override
@@ -467,34 +480,57 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			
 	}
 	
-	private void collision(Contact contact) {
+	private void collision(Contact contact) throws NullPointerException {
 		Body bodyA = contact.getFixtureA().getBody();
 		Body bodyB = contact.getFixtureB().getBody();
 		Object objA = bodyA.getUserData();
 		Object objB = bodyB.getUserData();
 		PhysicsData dataA = null;
 		PhysicsData dataB = null;
+		PhysicsAnimatedSprite spriteA = null;
+		PhysicsAnimatedSprite spriteB = null;
 		if(objA instanceof PhysicsData) {
 			dataA = (PhysicsData)objA;
-			PhysicsAnimatedSprite sp = dataA.sprite;
-			if(sp instanceof Bullet) {
-				//removePhysicsSprite(sp);
-			}
+			spriteA = dataA.sprite;
 		}
 		if(objB instanceof PhysicsData) {
 			dataB = (PhysicsData)objB;
-			PhysicsAnimatedSprite sp = dataB.sprite;
-			if(sp instanceof Bullet) {
-				//removePhysicsSprite(sp);
+			spriteB = dataB.sprite;
+		}
+		if(spriteA instanceof Bullet) {
+			removePhysicsSprite(spriteA);
+			if(spriteB instanceof PhysicsAnimatedSprite) {
+				spriteB.hit();
+			}
+		}
+		if(spriteB instanceof Bullet) {
+			removePhysicsSprite(spriteB);
+			if(spriteA instanceof PhysicsAnimatedSprite) {
+				spriteA.hit();
 			}
 		}
 	}
 	
-	private void removePhysicsSprite(PhysicsAnimatedSprite sp) {
-		PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(sp);
-		mPhysicsWorld.unregisterPhysicsConnector(connect);
-		mPhysicsWorld.destroyBody(connect.getBody());
-		scene.getLastChild().detachChild(sp);
+	public void removePhysicsSprite(PhysicsAnimatedSprite sp) {
+		this.runOnUpdateThread(new RemovePhysicsSprite(sp));
+	}
+	
+	public class RemovePhysicsSprite implements Runnable {
+		private PhysicsAnimatedSprite sp;
+		public RemovePhysicsSprite(PhysicsAnimatedSprite sp) {
+			this.sp = sp;
+		}
+		public void run() {
+			try {
+			PhysicsConnector connect = mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(sp);
+			mPhysicsWorld.unregisterPhysicsConnector(connect);
+			mPhysicsWorld.destroyBody(connect.getBody());
+			scene.getLastChild().detachChild(sp);
+			}
+			catch(NullPointerException e) {
+				return;
+			}
+		}
 	}
 	
 }
