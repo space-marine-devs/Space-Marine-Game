@@ -78,6 +78,18 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	public Texture endBlockTexture;
 	public TextureRegion endBlockTextureRegion;
 	
+	public Texture scientistTexture;
+	public TiledTextureRegion scientistTextureRegion;
+	
+	public Texture ninjaTexture;
+	public TiledTextureRegion ninjaTextureRegion;
+	
+	public Texture stockBrokerTexture;
+	public TiledTextureRegion stockBrokerTextureRegion;
+	
+	public Texture racerTexture;
+	public TiledTextureRegion racerTextureRegion;
+	
 	public Texture playerTexture;  //I think this is like a texture container.  or something.
 	public TiledTextureRegion mPlayerTextureRegion; // player texture
 	public Texture bulletTexture;
@@ -106,6 +118,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	public Shape right;
 	
 	private Player player;
+	private Enemy ninja;
 	
 	
 	private float mGravityX;
@@ -113,12 +126,10 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	private int playerX;
 	private int playerY;
-	private Scene scene;
+	Scene scene;
 	
-	BaseGameActivity THIS = this;
+	pbvs THIS = this;
 
-    private boolean mPlaceOnScreenControlsAtDifferentVerticalLocations = false;
-	
 	
 	
 	/*
@@ -149,9 +160,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
                          engine.setTouchController(new MultiTouchController());
                          if(MultiTouch.isSupportedDistinct(this)) {
                                  //Toast.makeText(this, "MultiTouch detected --> Both controls will work properly!", Toast.LENGTH_SHORT).show();
-                         } else {
-                                 this.mPlaceOnScreenControlsAtDifferentVerticalLocations = true;
-                                 //Toast.makeText(this, "MultiTouch detected, but your device has problems distinguishing between fingers.\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
+                         } 
+                         else {
                          }
                  } else {
                          Toast.makeText(this, "Sorry your device does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
@@ -169,7 +179,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.prepSpriteTextures();
 			this.prepParaBackground();
 			this.prepControlTextures();
-			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture,
+			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture, this.ninjaTexture,
 					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture, bulletTexture, this.block1X4Texture, this.block4X1Texture );
 	}
 
@@ -188,7 +198,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			playerX = (CAMERA_WIDTH - this.mPlayerTextureRegion.getTileWidth()) / 2;
 			playerY = 0;
 			
-			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld);
+			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld, this);
 			scene.getLastChild().attachChild(player);
 			this.mCamera.setChaseEntity(player);
 			
@@ -220,6 +230,11 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, right, BodyType.StaticBody, wallFixtureDef);
            
             scene.registerUpdateHandler(this.mPhysicsWorld);
+            
+            //create enemy
+            ninja = new Enemy(player.getX()+100, player.getY(), this.ninjaTextureRegion, mPhysicsWorld, this);
+			scene.getLastChild().attachChild(ninja);
+            
 			
 			return scene;
 	}
@@ -339,9 +354,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					player.setJump();
 				}
 				if(controlXVal > 0f) {
-					Bullet bullet = new Bullet(player.getX()+(player.dir*40), player.getY()-25, bulletTextureRegion, mPhysicsWorld);
-					scene.getLastChild().attachChild(bullet);
-					bullet.shoot(player.dir);
+					player.shoot();
 				}
 				
 			}
@@ -369,12 +382,25 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	private void prepSpriteTextures()
 	{
 		this.playerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.scientistTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.ninjaTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.stockBrokerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.racerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		
+		this.ninjaTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block1X4Texture = new Texture(128, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block4X1Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.bulletTexture = new Texture(32, 64, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		
 		//this.block1X4Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.scientistTextureRegion = TextureRegionFactory.createTiledFromAsset(this.scientistTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.ninjaTextureRegion = TextureRegionFactory.createTiledFromAsset(this.ninjaTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.stockBrokerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.stockBrokerTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.racerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.racerTexture, this, "player_possible.png", 0, 0, 3, 4);
+		
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.ninjaTextureRegion = TextureRegionFactory.createTiledFromAsset(this.ninjaTexture, this, "ninja.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
 		this.block1X4TextureRegion = TextureRegionFactory.createFromAsset(this.block1X4Texture, this, "block4x1.png", 0, 0);
 		this.block4X1TextureRegion = TextureRegionFactory.createFromAsset(this.block4X1Texture, this, "block1x4.png", 0, 0);
@@ -470,22 +496,26 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			spriteB = dataB.sprite;
 		}
 		if(spriteA instanceof Bullet) {
-			this.runOnUpdateThread(new removePhysicsSprite(spriteA));
+			removePhysicsSprite(spriteA);
 			if(spriteB instanceof PhysicsAnimatedSprite) {
 				spriteB.hit();
 			}
 		}
 		if(spriteB instanceof Bullet) {
-			this.runOnUpdateThread(new removePhysicsSprite(spriteB));
+			removePhysicsSprite(spriteB);
 			if(spriteA instanceof PhysicsAnimatedSprite) {
 				spriteA.hit();
 			}
 		}
 	}
 	
-	private class removePhysicsSprite implements Runnable {
+	public void removePhysicsSprite(PhysicsAnimatedSprite sp) {
+		this.runOnUpdateThread(new RemovePhysicsSprite(sp));
+	}
+	
+	public class RemovePhysicsSprite implements Runnable {
 		private PhysicsAnimatedSprite sp;
-		public removePhysicsSprite(PhysicsAnimatedSprite sp) {
+		public RemovePhysicsSprite(PhysicsAnimatedSprite sp) {
 			this.sp = sp;
 		}
 		public void run() {
