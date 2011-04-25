@@ -78,6 +78,18 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	public Texture endBlockTexture;
 	public TextureRegion endBlockTextureRegion;
 	
+	public Texture scientistTexture;
+	public TiledTextureRegion scientistTextureRegion;
+	
+	public Texture ninjaTexture;
+	public TiledTextureRegion ninjaTextureRegion;
+	
+	public Texture stockBrokerTexture;
+	public TiledTextureRegion stockBrokerTextureRegion;
+	
+	public Texture racerTexture;
+	public TiledTextureRegion racerTextureRegion;
+	
 	public Texture playerTexture;  //I think this is like a texture container.  or something.
 	public TiledTextureRegion mPlayerTextureRegion; // player texture
 	public Texture bulletTexture;
@@ -366,11 +378,22 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	private void prepSpriteTextures()
 	{
 		this.playerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.scientistTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.ninjaTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.stockBrokerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.racerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block1X4Texture = new Texture(128, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block4X1Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.bulletTexture = new Texture(32, 64, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		
 		//this.block1X4Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.scientistTextureRegion = TextureRegionFactory.createTiledFromAsset(this.scientistTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.ninjaTextureRegion = TextureRegionFactory.createTiledFromAsset(this.ninjaTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.stockBrokerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.stockBrokerTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.racerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.racerTexture, this, "player_possible.png", 0, 0, 3, 4);
+		
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
 		this.block1X4TextureRegion = TextureRegionFactory.createFromAsset(this.block1X4Texture, this, "block4x1.png", 0, 0);

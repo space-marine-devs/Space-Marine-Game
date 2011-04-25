@@ -7,6 +7,7 @@ import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.level.LevelLoader;
 import org.anddev.andengine.level.util.constants.LevelConstants;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
+import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.util.SAXUtils;
 import org.xml.sax.Attributes;
 
@@ -32,6 +33,10 @@ public class LevelLoaderWrapper extends LevelLoader {
 	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_METALBOX = "metalbox";
 	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_4X1BLOCK = "4x1block";
 	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_1X4BLOCK = "1x4block";
+	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_SCIENTIST = "scientist";
+	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_NINJA = "ninja";
+	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_STOCKBROKER = "stockbroker";
+	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_RACER = "racer";
 	LevelLoaderWrapper(final pbvs game, final Scene scene )
 	{
 		this.setAssetBasePath("level/");
@@ -71,7 +76,9 @@ public class LevelLoaderWrapper extends LevelLoader {
 					final String type = SAXUtils.getAttributeOrThrow(pAttributes, TAG_ENTITY_ATTRIBUTE_TYPE);
 	
 					TextureRegion temp = null;
+					TiledTextureRegion temp_tiled = null;
 					boolean dynamic = false;
+					boolean npc = false;
 					if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_METALBOX)) 
 					{
 						dynamic = true;
@@ -85,6 +92,22 @@ public class LevelLoaderWrapper extends LevelLoader {
 					{
 						temp = game.block1X4TextureRegion;
 					}
+					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_SCIENTIST)) 
+					{
+						temp_tiled = game.scientistTextureRegion;
+					}
+					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_NINJA)) 
+					{
+						temp_tiled = game.ninjaTextureRegion;
+					}
+					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_STOCKBROKER)) 
+					{
+						temp_tiled = game.stockBrokerTextureRegion;
+					}
+					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_RACER)) 
+					{
+						temp_tiled = game.racerTextureRegion;
+					}
 					else
 					{
 						return;
@@ -96,6 +119,12 @@ public class LevelLoaderWrapper extends LevelLoader {
 						final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(0, 0f, 0.5f);
 			            PhysicsFactory.createBoxBody(game.mPhysicsWorld, a, BodyType.StaticBody, wallFixtureDef);
 						scene.getLastChild().attachChild(a);
+					}
+					else if ( npc )
+					{
+						
+						
+						
 					}
 					else
 					{
