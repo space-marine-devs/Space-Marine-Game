@@ -1,6 +1,7 @@
 package edu.ua.cs.pbvs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -66,6 +67,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 	private BoundCamera mCamera;
 
+	private ArrayList<PhysicsAnimatedSprite> characters;
+	
 	public Texture scaffoldTexture;  
 	public TextureRegion metalBoxTextureRegion;
 	
@@ -174,6 +177,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	}
 
 	public void onLoadResources() {
+			this.characters = new ArrayList<PhysicsAnimatedSprite>();
 	        this.enableAccelerometerSensor(this);	
 			TextureRegionFactory.setAssetBasePath("gfx/");
 			this.prepSpriteTextures();
@@ -199,6 +203,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			playerY = 0;
 			
 			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld, this);
+			characters.add(player);
+			
 			scene.getLastChild().attachChild(player);
 			this.mCamera.setChaseEntity(player);
 			
@@ -234,6 +240,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             
             //create enemy
             ninja = new Enemy(player.getX()+100, player.getY(), this.ninjaTextureRegion, mPhysicsWorld, this);
+            characters.add(ninja);
 			scene.getLastChild().attachChild(ninja);
 			/*
 			final PhysicsHandler ch = new PhysicsHandler(ninja);
@@ -449,16 +456,29 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
          final Vector2 playerGravity = Vector2Pool.obtain(0, SensorManager.GRAVITY_EARTH);
          this.mPhysicsWorld.setGravity(gravity);
          
-		 final Body playerBody = this.mPhysicsWorld.getPhysicsConnectorManager().findBodyByShape(player);
-
-         //playerBody.applyLinearImpulse(playerGravity, new Vector2(player.getHeightScaled()/2, player.getWidthScaled()/2));
-         playerBody.applyLinearImpulse(playerGravity, new Vector2( 0, 0 ));
-         playerBody.setAngularVelocity(0f);
-         playerBody.setAngularVelocity(0f);
          
+         /*
+		 final Body playerBody = this.mPhysicsWorld.getPhysicsConnectorManager().findBodyByShape(player);
+         playerBody.applyLinearImpulse(playerGravity, new Vector2( 0, 0 ));
+         */
+         
+		 setCharacterGravity(playerGravity);
          Vector2Pool.recycle(gravity);
          Vector2Pool.recycle(playerGravity);
 		
+	}
+	
+	public void setCharacterGravity(Vector2 charGravity)
+	{
+		for (int i = 0; i < characters.size(); i++)
+		{
+			this.setBodyForce(characters.get(i).body, charGravity);
+		}
+	}
+
+	public void setBodyForce( Body temp, Vector2 charGravity)
+	{
+		temp.applyLinearImpulse( charGravity, new Vector2(0,0) );
 	}
 	
 	class ContactDetector implements ContactListener {
