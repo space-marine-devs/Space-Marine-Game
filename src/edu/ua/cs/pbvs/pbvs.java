@@ -78,12 +78,22 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	public Texture endBlockTexture;
 	public TextureRegion endBlockTextureRegion;
 	
+	public Texture scientistTexture;
+	public TiledTextureRegion scientistTextureRegion;
+	
+	public Texture ninjaTexture;
+	public TiledTextureRegion ninjaTextureRegion;
+	
+	public Texture stockBrokerTexture;
+	public TiledTextureRegion stockBrokerTextureRegion;
+	
+	public Texture racerTexture;
+	public TiledTextureRegion racerTextureRegion;
+	
 	public Texture playerTexture;  //I think this is like a texture container.  or something.
 	public TiledTextureRegion mPlayerTextureRegion; // player texture
 	public Texture bulletTexture;
 	public TiledTextureRegion bulletTextureRegion;
-	public Texture ninjaTexture;
-	public TiledTextureRegion ninjaTextureRegion;
 
 	public Texture mAutoParallaxBackgroundTexture;
 
@@ -120,8 +130,6 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	pbvs THIS = this;
 
-    private boolean mPlaceOnScreenControlsAtDifferentVerticalLocations = false;
-	
 	
 	
 	/*
@@ -152,9 +160,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
                          engine.setTouchController(new MultiTouchController());
                          if(MultiTouch.isSupportedDistinct(this)) {
                                  //Toast.makeText(this, "MultiTouch detected --> Both controls will work properly!", Toast.LENGTH_SHORT).show();
-                         } else {
-                                 this.mPlaceOnScreenControlsAtDifferentVerticalLocations = true;
-                                 //Toast.makeText(this, "MultiTouch detected, but your device has problems distinguishing between fingers.\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
+                         } 
+                         else {
                          }
                  } else {
                          Toast.makeText(this, "Sorry your device does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)\n\nControls are placed at different vertical locations.", Toast.LENGTH_LONG).show();
@@ -375,12 +382,23 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	private void prepSpriteTextures()
 	{
 		this.playerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.scientistTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.ninjaTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.stockBrokerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.racerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		
 		this.ninjaTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block1X4Texture = new Texture(128, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block4X1Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.bulletTexture = new Texture(32, 64, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		
 		//this.block1X4Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.scientistTextureRegion = TextureRegionFactory.createTiledFromAsset(this.scientistTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.ninjaTextureRegion = TextureRegionFactory.createTiledFromAsset(this.ninjaTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.stockBrokerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.stockBrokerTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.racerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.racerTexture, this, "player_possible.png", 0, 0, 3, 4);
+		
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
 		this.ninjaTextureRegion = TextureRegionFactory.createTiledFromAsset(this.ninjaTexture, this, "ninja.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
