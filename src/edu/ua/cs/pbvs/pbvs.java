@@ -82,6 +82,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	public TiledTextureRegion mPlayerTextureRegion; // player texture
 	public Texture bulletTexture;
 	public TiledTextureRegion bulletTextureRegion;
+	public Texture ninjaTexture;
+	public TiledTextureRegion ninjaTextureRegion;
 
 	public Texture mAutoParallaxBackgroundTexture;
 
@@ -106,6 +108,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	public Shape right;
 	
 	private Player player;
+	private Enemy ninja;
 	
 	
 	private float mGravityX;
@@ -169,7 +172,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			this.prepSpriteTextures();
 			this.prepParaBackground();
 			this.prepControlTextures();
-			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture,
+			this.mEngine.getTextureManager().loadTextures(this.scaffoldTexture, this.playerTexture, this.ninjaTexture,
 					this.mOnScreenControlTexture , this.mAutoParallaxBackgroundTexture, this.mOnScreenButtonTexture, bulletTexture, this.block1X4Texture, this.block4X1Texture );
 	}
 
@@ -220,6 +223,11 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             PhysicsFactory.createBoxBody(this.mPhysicsWorld, right, BodyType.StaticBody, wallFixtureDef);
            
             scene.registerUpdateHandler(this.mPhysicsWorld);
+            
+            //create enemy
+            ninja = new Enemy(player.getX()+100, player.getY(), this.ninjaTextureRegion, mPhysicsWorld, this);
+			scene.getLastChild().attachChild(ninja);
+            
 			
 			return scene;
 	}
@@ -369,12 +377,14 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	private void prepSpriteTextures()
 	{
 		this.playerTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
+		this.ninjaTexture = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.scaffoldTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block1X4Texture = new Texture(128, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.block4X1Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.bulletTexture = new Texture(32, 64, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		//this.block1X4Texture = new Texture(32, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA); //inits the texture
 		this.mPlayerTextureRegion = TextureRegionFactory.createTiledFromAsset(this.playerTexture, this, "player_possible.png", 0, 0, 3, 4);
+		this.ninjaTextureRegion = TextureRegionFactory.createTiledFromAsset(this.ninjaTexture, this, "ninja.png", 0, 0, 3, 4);
 		this.metalBoxTextureRegion = TextureRegionFactory.createFromAsset(this.scaffoldTexture, this, "metal_block.png", 0, 0);
 		this.block1X4TextureRegion = TextureRegionFactory.createFromAsset(this.block1X4Texture, this, "block4x1.png", 0, 0);
 		this.block4X1TextureRegion = TextureRegionFactory.createFromAsset(this.block4X1Texture, this, "block1x4.png", 0, 0);
