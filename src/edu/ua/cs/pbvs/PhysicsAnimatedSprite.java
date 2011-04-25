@@ -16,9 +16,12 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 
 	public Body body;
 	public boolean jumping = true;
+	pbvs act;
+	public int dir = 0;
 
-	public PhysicsAnimatedSprite(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world ) {
+	public PhysicsAnimatedSprite(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act ) {
 		super(pX, pY, pTiledTextureRegion);
+		this.act = act;
 	    final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
 		body = PhysicsFactory.createBoxBody(world, this, BodyType.DynamicBody, FIXTURE_DEF);
 		PhysicsConnector connect = new PhysicsConnector(this, body, true, true);
@@ -45,6 +48,12 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 	
 	public void hit() {
 		
+	}
+	
+	public void shoot() {
+		Bullet bullet = new Bullet(this.getX()+(this.dir*40), this.getY()-25, act.bulletTextureRegion, act.mPhysicsWorld, act);
+		act.scene.getLastChild().attachChild(bullet);
+		bullet.shoot(this.dir);
 	}
 }
 
