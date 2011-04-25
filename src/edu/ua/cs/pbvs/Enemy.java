@@ -41,7 +41,7 @@ public class Enemy extends PhysicsAnimatedSprite {
 		world.getPhysicsConnectorManager().findBodyByShape(this).setLinearVelocity(vector);
 	}
 	
-	int pathLength = 0;
+	int pathLength = 15;
 	public void onUpdate(int pSecondsElapsed)
 	{
 		if(!this.mIgnoreUpdate) {

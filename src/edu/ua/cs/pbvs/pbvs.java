@@ -242,10 +242,8 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             ninja = new Enemy(player.getX()+100, player.getY(), this.ninjaTextureRegion, mPhysicsWorld, this);
             characters.add(ninja);
 			scene.getLastChild().attachChild(ninja);
-			/*
 			final PhysicsHandler ch = new PhysicsHandler(ninja);
 			ninja.registerUpdateHandler(ch);
-			*/
             
 			
 			return scene;
