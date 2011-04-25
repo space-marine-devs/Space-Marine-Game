@@ -129,9 +129,9 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 	
 	private int playerX;
 	private int playerY;
-	private Scene scene;
+	Scene scene;
 	
-	BaseGameActivity THIS = this;
+	pbvs THIS = this;
 
 	
 	
@@ -361,9 +361,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 					player.setJump();
 				}
 				if(controlXVal > 0f) {
-					Bullet bullet = new Bullet(player.getX()+(player.dir*40), player.getY()-25, bulletTextureRegion, mPhysicsWorld);
-					scene.getLastChild().attachChild(bullet);
-					bullet.shoot(player.dir);
+					player.shoot();
 				}
 				
 			}

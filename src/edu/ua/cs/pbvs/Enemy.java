@@ -10,9 +10,10 @@ public class Enemy extends PhysicsAnimatedSprite {
 	
 	private float health = 10;
 	pbvs act;
+	private int dir;
 	
 	public Enemy(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act ) {
-		super(pX, pY, pTiledTextureRegion, world);
+		super(pX, pY, pTiledTextureRegion, world, act);
 	    //final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
 		this.act = act;
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);

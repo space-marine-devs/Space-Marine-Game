@@ -8,12 +8,11 @@ import org.anddev.andengine.ui.activity.BaseGameActivity;
 public class Player extends PhysicsAnimatedSprite{
 	public float health = 10;
 	public int jump_count = 0;
-	public int dir = 0;
 	pbvs act;
 
 
 	public Player(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act ) {
-		super(pX, pY, pTiledTextureRegion, world);
+		super(pX, pY, pTiledTextureRegion, world, act);
 	    //final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
 		this.act = act;
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
@@ -38,6 +37,7 @@ public class Player extends PhysicsAnimatedSprite{
 	public void hit() {
 		//health--;
 	}
+
 	//force commit!
 	
 }

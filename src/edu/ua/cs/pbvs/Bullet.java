@@ -7,10 +7,12 @@ import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 public class Bullet extends PhysicsAnimatedSprite{
+	pbvs act;
 
 
-	public Bullet(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world ) {
-		super(pX, pY, pTiledTextureRegion, world);
+	public Bullet(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act ) {
+		super(pX, pY, pTiledTextureRegion, world, act);
+		this.act = act;
 	    //final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
 		this.setScale(3);
