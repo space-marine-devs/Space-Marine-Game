@@ -19,7 +19,7 @@ public class Enemy extends PhysicsAnimatedSprite {
 	PhysicsWorld world;
 	
 	public Enemy(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act ) {
-		super(pX, pY, pTiledTextureRegion, world, act);
+		super(pX, pY, pTiledTextureRegion, world, act, 0.0f);
 		this.world = world;
 	    //final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
 		this.act = act;
@@ -27,6 +27,7 @@ public class Enemy extends PhysicsAnimatedSprite {
 		this.setScale(3);
 		this.body.setFixedRotation(true);
 		createTimeHandler();
+		createShootHandler();
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -39,21 +40,35 @@ public class Enemy extends PhysicsAnimatedSprite {
 	
 	public void move(int newDir) {
 		dir = newDir;
-		Vector2 vector = Vector2Pool.obtain(dir*10, 0);
-		body.setLinearVelocity(vector);
+		final Vector2 velocity = Vector2Pool.obtain(dir*30, 0);
+		body.applyLinearImpulse(velocity, body.getLocalCenter());
+		Vector2Pool.recycle(velocity);
 	}
 	
 	private void createTimeHandler()
 	{
 	        TimerHandler timerHandler;
 	       
-	        act.getEngine().registerUpdateHandler(timerHandler = new TimerHandler(5, new ITimerCallback()
+	        act.getEngine().registerUpdateHandler(timerHandler = new TimerHandler(1, new ITimerCallback()
 	        {                      
 	            public void onTimePassed(final TimerHandler pTimerHandler)
 	            {
 	            	dir *= -1;
 	            	move(dir);
 	            	createTimeHandler();
+	            }
+	        }));
+	}
+	
+	private void createShootHandler()
+	{
+	        TimerHandler timerHandler;
+	       
+	        act.getEngine().registerUpdateHandler(timerHandler = new TimerHandler(.25f, new ITimerCallback()
+	        {                      
+	            public void onTimePassed(final TimerHandler pTimerHandler)
+	            {
+	            	shoot();
 	            }
 	        }));
 	}	
