@@ -53,7 +53,7 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 	
 	public void shoot() {
 		Bullet bullet = new Bullet(this.getX()+(this.dir*40), this.getY()-25, act.bulletTextureRegion, act.mPhysicsWorld, act, false);
-		act.scene.getLastChild().attachChild(bullet);
+		//act.scene.getLastChild().attachChild(bullet);
 		bullet.shoot(this.dir);
 	}
 }
