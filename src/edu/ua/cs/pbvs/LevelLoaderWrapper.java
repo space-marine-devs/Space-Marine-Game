@@ -47,7 +47,7 @@ public class LevelLoaderWrapper extends LevelLoader {
 					final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_HEIGHT);
 					//Toast.makeText(pbvs.this, "Loaded level with width=" + width + " and height=" + height + ".", Toast.LENGTH_LONG).show();
 					
-					game.ground = new Rectangle(-3200, height, width+3200, 3200);
+					game.ground = new Rectangle(-3200, height+64, width+3200, 3200);
 					game.roof   = new Rectangle(-3200, -3200, width+3200, 3200);
 					game.left   = new Rectangle(-3200, -3200, 3200, height+6400);
 					game.right  = new Rectangle(width, -3200, 3200, 6400);
