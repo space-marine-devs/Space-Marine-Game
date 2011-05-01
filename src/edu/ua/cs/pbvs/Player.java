@@ -12,7 +12,7 @@ public class Player extends PhysicsAnimatedSprite{
 
 
 	public Player(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act ) {
-		super(pX, pY, pTiledTextureRegion, world, act);
+		super(pX, pY, pTiledTextureRegion, world, act, 0.5f);
 	    //final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
 		this.act = act;
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
