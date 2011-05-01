@@ -212,6 +212,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			
 			final PhysicsHandler controlHandler = new PhysicsHandler(player);
 			player.registerUpdateHandler(controlHandler);  //this is the thing that the controls control.
+			ninja.registerUpdateHandler(controlHandler);
 			
 			
 			final ParallaxBackground paraBack = this.loadManualParallax();

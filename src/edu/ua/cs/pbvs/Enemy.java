@@ -39,6 +39,7 @@ public class Enemy extends PhysicsAnimatedSprite {
 		dir = newDir;
 		Vector2 vector = Vector2Pool.obtain(dir*20, 0);
 		world.getPhysicsConnectorManager().findBodyByShape(this).setLinearVelocity(vector);
+		 Vector2Pool.recycle(vector);
 	}
 	
 	int pathLength = 15;
@@ -54,5 +55,4 @@ public class Enemy extends PhysicsAnimatedSprite {
 			move(dir);
 		}
 	}
-
 }
