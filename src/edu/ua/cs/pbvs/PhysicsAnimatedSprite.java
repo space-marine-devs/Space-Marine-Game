@@ -28,6 +28,8 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
         world.registerPhysicsConnector(connect);
         body.setUserData(new PhysicsData(this, connect));
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
+		act.characters.add(this);
+		act.scene.getLastChild().attachChild(this);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -46,12 +48,11 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 		jumping = true;
 	}
 	
-	public void hit() {
-		
+	public void hit(Bullet bullet) {
 	}
 	
 	public void shoot() {
-		Bullet bullet = new Bullet(this.getX()+(this.dir*40), this.getY()-25, act.bulletTextureRegion, act.mPhysicsWorld, act);
+		Bullet bullet = new Bullet(this.getX()+(this.dir*40), this.getY()-25, act.bulletTextureRegion, act.mPhysicsWorld, act, false);
 		act.scene.getLastChild().attachChild(bullet);
 		bullet.shoot(this.dir);
 	}

@@ -8,9 +8,10 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Bullet extends PhysicsAnimatedSprite{
 	pbvs act;
+	private boolean fromPlayer;
 
 
-	public Bullet(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act ) {
+	public Bullet(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act, boolean fromPlayer) {
 		super(pX, pY, pTiledTextureRegion, world, act, 0.5f);
 		this.act = act;
 	    //final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);
@@ -18,7 +19,12 @@ public class Bullet extends PhysicsAnimatedSprite{
 		this.setScale(3);
 		this.body.setFixedRotation(true);
 		this.body.setBullet(true);
+		this.fromPlayer = fromPlayer; 
 		// TODO Auto-generated constructor stub
+	}
+	
+	public boolean isFromPlayer() {
+		return fromPlayer;
 	}
 	
 	public void shoot(int dir) {
@@ -28,6 +34,4 @@ public class Bullet extends PhysicsAnimatedSprite{
 	}
 	
 }
-
-//force commit
 

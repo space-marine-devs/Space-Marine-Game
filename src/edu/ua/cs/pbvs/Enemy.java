@@ -17,6 +17,7 @@ public class Enemy extends PhysicsAnimatedSprite {
 	pbvs act;
 	private int dir = 1;
 	PhysicsWorld world;
+	boolean alive;
 	
 	public Enemy(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act ) {
 		super(pX, pY, pTiledTextureRegion, world, act, 0.0f);
@@ -26,15 +27,20 @@ public class Enemy extends PhysicsAnimatedSprite {
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
 		this.setScale(3);
 		this.body.setFixedRotation(true);
+		alive = true;
 		createTimeHandler();
 		createShootHandler();
 		// TODO Auto-generated constructor stub
 	}
 	
-	public void hit() {
+	public void hit(Bullet bullet) {
+		if(!bullet.isFromPlayer()) {
+			return;
+		}
 		health -= 2;
 		if(health == 0) {
 			act.removePhysicsSprite(this);
+			alive = false;
 		}
 	}
 	
@@ -55,7 +61,9 @@ public class Enemy extends PhysicsAnimatedSprite {
 	            {
 	            	dir *= -1;
 	            	move(dir);
-	            	createTimeHandler();
+	            	if(alive) {
+	            		createTimeHandler();
+	            	}
 	            }
 	        }));
 	}
@@ -64,11 +72,14 @@ public class Enemy extends PhysicsAnimatedSprite {
 	{
 	        TimerHandler timerHandler;
 	       
-	        act.getEngine().registerUpdateHandler(timerHandler = new TimerHandler(.25f, new ITimerCallback()
+	        act.getEngine().registerUpdateHandler(timerHandler = new TimerHandler(1f, new ITimerCallback()
 	        {                      
 	            public void onTimePassed(final TimerHandler pTimerHandler)
 	            {
 	            	shoot();
+	            	if(alive) {
+	            		createShootHandler();
+	            	}
 	            }
 	        }));
 	}	
