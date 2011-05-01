@@ -56,7 +56,7 @@ public class Enemy extends PhysicsAnimatedSprite {
 	{
 	        TimerHandler timerHandler;
 	       
-	        act.getEngine().registerUpdateHandler(timerHandler = new TimerHandler(1, new ITimerCallback()
+	        act.getEngine().registerUpdateHandler(timerHandler = new TimerHandler((float) (1+Math.random()), new ITimerCallback()
 	        {                      
 	            public void onTimePassed(final TimerHandler pTimerHandler)
 	            {
@@ -84,4 +84,11 @@ public class Enemy extends PhysicsAnimatedSprite {
 	            }
 	        }));
 	}	
+	
+	
+	public void shoot() {
+		Bullet bullet = new Bullet(this.getX()+(this.dir*40), this.getY()-25, act.bulletTextureRegion, act.mPhysicsWorld, act, false);
+		//act.scene.getLastChild().attachChild(bullet);
+		bullet.shoot(this.dir);
+	}
 }
