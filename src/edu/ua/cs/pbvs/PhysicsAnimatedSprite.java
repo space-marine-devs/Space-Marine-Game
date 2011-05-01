@@ -19,7 +19,7 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
 	pbvs act;
 	public int dir = 0;
 
-	public PhysicsAnimatedSprite(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act ) {
+	public PhysicsAnimatedSprite(float pX, float pY, TiledTextureRegion pTiledTextureRegion, PhysicsWorld world, pbvs act, float friction ) {
 		super(pX, pY, pTiledTextureRegion);
 		this.act = act;
 	    final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0f, 0.5f);

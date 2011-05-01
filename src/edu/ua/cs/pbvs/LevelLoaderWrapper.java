@@ -94,18 +94,22 @@ public class LevelLoaderWrapper extends LevelLoader {
 					}
 					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_SCIENTIST)) 
 					{
+						npc = true;
 						temp_tiled = game.scientistTextureRegion;
 					}
 					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_NINJA)) 
 					{
+						npc = true;
 						temp_tiled = game.ninjaTextureRegion;
 					}
 					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_STOCKBROKER)) 
 					{
+						npc = true;
 						temp_tiled = game.stockBrokerTextureRegion;
 					}
 					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_RACER)) 
 					{
+						npc = true;
 						temp_tiled = game.racerTextureRegion;
 					}
 					else
