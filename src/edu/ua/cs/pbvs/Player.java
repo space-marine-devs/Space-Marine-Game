@@ -34,8 +34,14 @@ public class Player extends PhysicsAnimatedSprite{
 		}
 	}
 	
-	public void hit() {
+	public void hit(Bullet bullet) {
 		//health--;
+	}
+	
+	public void shoot() {
+		Bullet bullet = new Bullet(this.getX()+(this.dir*40), this.getY()-25, act.bulletTextureRegion, act.mPhysicsWorld, act, true);
+		act.scene.getLastChild().attachChild(bullet);
+		bullet.shoot(this.dir);
 	}
 
 	//force commit!

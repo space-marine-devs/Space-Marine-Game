@@ -67,7 +67,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 
 	private BoundCamera mCamera;
 
-	private ArrayList<PhysicsAnimatedSprite> characters;
+	public ArrayList<PhysicsAnimatedSprite> characters;
 	
 	public Texture scaffoldTexture;  
 	public TextureRegion metalBoxTextureRegion;
@@ -203,9 +203,9 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			playerY = 0;
 			
 			player = new Player(playerX, playerY, this.mPlayerTextureRegion, mPhysicsWorld, this);
-			characters.add(player);
+			//characters.add(player);
 			
-			scene.getLastChild().attachChild(player);
+			//scene.getLastChild().attachChild(player);
 			this.mCamera.setChaseEntity(player);
 			
 			
@@ -242,10 +242,10 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             //create enemy
             
             ninja = new Enemy(player.getX()+100, player.getY(), this.ninjaTextureRegion, mPhysicsWorld, this);
-            characters.add(ninja);
-			scene.getLastChild().attachChild(ninja);
-			final PhysicsHandler ch = new PhysicsHandler(ninja);
-			ninja.registerUpdateHandler(ch);
+            //characters.add(ninja);
+			//scene.getLastChild().attachChild(ninja);
+			//final PhysicsHandler ch = new PhysicsHandler(ninja);
+			//ninja.registerUpdateHandler(ch);
             
 			
 			return scene;
@@ -521,13 +521,13 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 		if(spriteA instanceof Bullet) {
 			removePhysicsSprite(spriteA);
 			if(spriteB instanceof PhysicsAnimatedSprite) {
-				spriteB.hit();
+				spriteB.hit((Bullet)spriteA);
 			}
 		}
 		if(spriteB instanceof Bullet) {
 			removePhysicsSprite(spriteB);
 			if(spriteA instanceof PhysicsAnimatedSprite) {
-				spriteA.hit();
+				spriteA.hit((Bullet)spriteB);
 			}
 		}
 	}
