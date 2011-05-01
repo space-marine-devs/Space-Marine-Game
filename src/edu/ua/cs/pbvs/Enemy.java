@@ -83,5 +83,4 @@ public class Enemy extends PhysicsAnimatedSprite {
 	            }
 	        }));
 	}	
-
 }
