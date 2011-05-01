@@ -94,21 +94,25 @@ public class LevelLoaderWrapper extends LevelLoader {
 					}
 					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_SCIENTIST)) 
 					{
+						dynamic = true;
 						npc = true;
 						temp_tiled = game.scientistTextureRegion;
 					}
 					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_NINJA)) 
 					{
+						dynamic = true;
 						npc = true;
 						temp_tiled = game.ninjaTextureRegion;
 					}
 					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_STOCKBROKER)) 
 					{
+						dynamic = true;
 						npc = true;
 						temp_tiled = game.stockBrokerTextureRegion;
 					}
 					else if(type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_RACER)) 
 					{
+						dynamic = true;
 						npc = true;
 						temp_tiled = game.racerTextureRegion;
 					}
@@ -126,8 +130,7 @@ public class LevelLoaderWrapper extends LevelLoader {
 					}
 					else if ( npc )
 					{
-						//Enemy a = new Enemy (x, y+64, temp_tiled, game.mPhysicsWorld, game);
-						
+						new Enemy (x, y+64, temp_tiled, game.mPhysicsWorld, game);
 					}
 					else
 					{
