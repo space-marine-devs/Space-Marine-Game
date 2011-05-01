@@ -18,6 +18,7 @@ public class Player extends PhysicsAnimatedSprite{
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
 		this.setScale(3);
 		this.body.setFixedRotation(true);
+		act.characters.add(this);
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -40,7 +41,7 @@ public class Player extends PhysicsAnimatedSprite{
 	
 	public void shoot() {
 		Bullet bullet = new Bullet(this.getX()+(this.dir*40), this.getY()-25, act.bulletTextureRegion, act.mPhysicsWorld, act, true);
-		act.scene.getLastChild().attachChild(bullet);
+		//act.scene.getLastChild().attachChild(bullet);
 		bullet.shoot(this.dir);
 	}
 

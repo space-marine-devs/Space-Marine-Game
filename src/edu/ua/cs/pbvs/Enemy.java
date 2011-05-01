@@ -30,6 +30,7 @@ public class Enemy extends PhysicsAnimatedSprite {
 		alive = true;
 		createTimeHandler();
 		createShootHandler();
+		act.characters.add(this);
 		// TODO Auto-generated constructor stub
 	}
 	

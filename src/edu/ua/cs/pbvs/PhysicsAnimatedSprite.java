@@ -28,7 +28,7 @@ public class PhysicsAnimatedSprite extends AnimatedSprite{
         world.registerPhysicsConnector(connect);
         body.setUserData(new PhysicsData(this, connect));
 		this.setScaleCenterY((pTiledTextureRegion.getHeight()/3)-10);
-		act.characters.add(this);
+		//act.characters.add(this);
 		act.scene.getLastChild().attachChild(this);
 		// TODO Auto-generated constructor stub
 	}
