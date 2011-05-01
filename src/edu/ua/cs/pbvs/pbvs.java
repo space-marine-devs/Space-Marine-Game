@@ -212,7 +212,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			
 			final PhysicsHandler controlHandler = new PhysicsHandler(player);
 			player.registerUpdateHandler(controlHandler);  //this is the thing that the controls control.
-			ninja.registerUpdateHandler(controlHandler);
+			//ninja.registerUpdateHandler(controlHandler);
 			
 			
 			final ParallaxBackground paraBack = this.loadManualParallax();
@@ -226,7 +226,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
 			//adds them to the scene
 			
 			try {
-				levelLoaderObj.loadLevelFromAsset(this, "test.lvl");
+				levelLoaderObj.loadLevelFromAsset(this, "test2.lvl");
 			} catch (final IOException e) {
 				Debug.e(e);
 			}
@@ -240,6 +240,7 @@ public class pbvs extends BaseGameActivity implements IAccelerometerListener, IO
             scene.registerUpdateHandler(this.mPhysicsWorld);
             
             //create enemy
+            
             ninja = new Enemy(player.getX()+100, player.getY(), this.ninjaTextureRegion, mPhysicsWorld, this);
             //characters.add(ninja);
 			//scene.getLastChild().attachChild(ninja);
